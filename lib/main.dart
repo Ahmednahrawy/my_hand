@@ -21,7 +21,7 @@ class MyApp extends HookConsumerWidget {
 
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'مساعد',
+      title: 'hand',
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
       themeMode:
