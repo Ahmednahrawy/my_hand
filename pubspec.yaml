@@ -46,6 +46,7 @@ dependencies:
   pdf: ^3.10.7
   pdf_viewer_plugin: ^2.0.1
   printing: ^5.11.1
+  share_plus: ^9.0.0
   # open_file: ^3.3.2
 
 

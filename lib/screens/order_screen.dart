@@ -1,13 +1,19 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:my_hand/screens/invoice_screen.dart';
+// import 'package:my_hand/screens/invoice_screen.dart';
 import 'package:my_hand/utils/helper_date_price.dart';
 import 'package:my_hand/utils/helper_widgets.dart';
 import 'package:my_hand/models/product_model.dart';
 
 import 'package:dropdown_search/dropdown_search.dart';
+import 'package:my_hand/utils/utils.dart';
 import 'package:my_hand/widgets/button.dart';
 import 'package:my_hand/widgets/data_table.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:pdf/pdf.dart';
+import 'package:share_plus/share_plus.dart';
 
 class Orderscreen extends StatefulWidget {
   const Orderscreen({super.key});
@@ -65,17 +71,17 @@ class _OrderscreenState extends State<Orderscreen> {
     super.initState();
   }
 
-  void submitForm(List<Product> products) {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (ctx) => InvoiceScreen(
-          products: products,
-          totalCost: _totalCost,
-          customerName: '${_customerNameController.text}',
-        ),
-      ),
-    );
-  }
+  // void submitForm(List<Product> products) {
+  //   Navigator.of(context).push(
+  //     MaterialPageRoute(
+  //       builder: (ctx) => InvoiceScreen(
+  //         products: products,
+  //         totalCost: _totalCost,
+  //         customerName: '${_customerNameController.text}',
+  //       ),
+  //     ),
+  //   );
+  // }
 
   Future<void> _selectDate(BuildContext context) async {
     DateTime selectedDate = DateTime.now();
@@ -140,7 +146,37 @@ class _OrderscreenState extends State<Orderscreen> {
       // Send data button
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          submitForm(products);
+          showModalBottomSheet(
+              context: context,
+              builder: (BuildContext context) {
+                return SizedBox(
+                  width: screenSize.width,
+                  height: 500,
+                  child: Column(
+                    children: [
+                      addVerticalSpace(5),
+                      SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          child: MyDataTable(products: products)),
+                      TextButton(
+                          onPressed: () async {
+                            final pdfDoc = await generatePDF(
+                                PdfPageFormat.a4,
+                                products,
+                                _totalCost,
+                                _customerNameController.text);
+                            // Get a temporary directory path to save the PDF
+                            final tempDir = await getTemporaryDirectory();
+                            final filePath = '${tempDir.path}/invoice.pdf';
+                            // Write the PDF bytes to the temporary file
+                            await File(filePath).writeAsBytes(pdfDoc);
+                            await Share.shareXFiles([XFile(filePath)]);
+                          },
+                          child: const Text('Send'))
+                    ],
+                  ),
+                );
+              });
         },
         child: const Icon(
           Icons.picture_as_pdf_outlined,
