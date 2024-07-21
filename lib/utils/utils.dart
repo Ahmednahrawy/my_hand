@@ -10,7 +10,6 @@ import 'package:printing/printing.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:pdf/widgets.dart';
 import 'package:my_hand/models/product_model.dart';
-import 'package:share_plus/share_plus.dart';
 
 Future<Uint8List> generatePDF(final PdfPageFormat format,
     List<Product> products, final double totalCost, String customerName) async {
