@@ -1,9 +1,9 @@
-import 'package:my_hand/models/sales/customer.dart';
-import 'package:my_hand/models/inventory-item.dart';
+import 'package:my_hand/features/data/models/supply/client.dart';
+import 'package:my_hand/features/data/models/inventory-item.dart';
 
-class Order {
-  final Customer customer;
-  final List<OrderItem> items; // List of ordered items and their quantities
+class Supply {
+  final Client client;
+  final List<SupplyItem> items; // List of supplied items and their quantities
   final DateTime date;
   final double totalAmount;
   final bool isInvoiced; // Indicates if an invoice has been generated
@@ -12,8 +12,8 @@ class Order {
   // - discount
   // - notes
 
-  Order({
-    required this.customer,
+  Supply({
+    required this.client,
     required this.items,
     required this.date,
     required this.totalAmount,
@@ -21,14 +21,14 @@ class Order {
   });
 }
 
-class OrderItem {
+class SupplyItem {
   final InventoryItem item;
   final int quantity;
   final double packageWeight;
   final double price;
   final int numberPackage;
 
-  OrderItem(
+  SupplyItem(
     this.packageWeight,
     this.price,
     this.numberPackage, {

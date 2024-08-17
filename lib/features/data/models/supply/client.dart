@@ -1,4 +1,4 @@
-import 'package:my_hand/models/supply/supply.dart';
+import 'package:my_hand/features/data/models/supply/supply.dart';
 
 class Client {
   final String name;

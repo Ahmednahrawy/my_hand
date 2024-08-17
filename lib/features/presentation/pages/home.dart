@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:my_hand/screens/home_screen.dart';
-import 'package:my_hand/screens/invoice_screen.dart';
+import 'package:my_hand/features/presentation/pages/home_screen.dart';
+import 'package:my_hand/features/presentation/pages/invoice_screen.dart';
 
 class Home extends StatefulWidget {
   final int initRoute;

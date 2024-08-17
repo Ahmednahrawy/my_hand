@@ -1,5 +1,5 @@
-import 'package:my_hand/models/sales/customer.dart';
-import 'package:my_hand/models/supply/supply.dart';
+import 'package:my_hand/features/data/models/sales/customer.dart';
+import 'package:my_hand/features/data/models/supply/supply.dart';
 
 class Invoice {
   final InvoiceInfo info;

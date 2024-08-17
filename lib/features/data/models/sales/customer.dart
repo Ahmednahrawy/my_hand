@@ -1,4 +1,4 @@
-import 'package:my_hand/models/sales/order.dart';
+import 'package:my_hand/features/data/models/sales/order.dart';
 
 class Customer {
   final String name;

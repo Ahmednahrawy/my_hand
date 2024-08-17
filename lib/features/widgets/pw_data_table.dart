@@ -1,4 +1,4 @@
-import 'package:my_hand/models/product_model.dart';
+import 'package:my_hand/features/data/models/product_model.dart';
 import 'package:pdf/widgets.dart' as pw;
 
 class PdfMyDataTable extends pw.StatelessWidget {

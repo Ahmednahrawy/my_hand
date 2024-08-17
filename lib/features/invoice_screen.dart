@@ -1,17 +1,20 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:my_hand/models/product_model.dart';
-import 'package:my_hand/utils/utils.dart';
+import 'package:my_hand/features/data/models/product_model.dart';
+import 'package:my_hand/core/util/utils.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
 
-
 class InvoiceScreen extends StatefulWidget {
-	InvoiceScreen({super.key, required this.products, required this.totalCost, required this.customerName});
+  InvoiceScreen(
+      {super.key,
+      required this.products,
+      required this.totalCost,
+      required this.customerName});
 
-		final String customerName;
-    final List<Product> products;
-		final double totalCost;
+  final String customerName;
+  final List<Product> products;
+  final double totalCost;
 
   @override
   State<InvoiceScreen> createState() => _InvoiceScreenState();
@@ -53,7 +56,12 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
         actions: actions,
         // onPrinted: showPrintedToast,
         // onShared: showSharedToast,
-        build: (format) => generatePDF(format, widget.products, widget.totalCost, widget.customerName),
+        build: (format) => generatePDF(
+          format,
+          widget.products,
+          widget.totalCost,
+          widget.customerName,
+        ),
       ),
     );
   }

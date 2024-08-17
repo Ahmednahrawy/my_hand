@@ -2,14 +2,14 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:my_hand/widgets/pw_data_table.dart';
+import 'package:my_hand/features/widgets/pw_data_table.dart';
 // import 'package:open_file/open_file.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:pdf/pdf.dart';
 import 'package:printing/printing.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:pdf/widgets.dart';
-import 'package:my_hand/models/product_model.dart';
+import 'package:my_hand/features/data/models/product_model.dart';
 
 Future<Uint8List> generatePDF(final PdfPageFormat format,
     List<Product> products, final double totalCost, String customerName) async {

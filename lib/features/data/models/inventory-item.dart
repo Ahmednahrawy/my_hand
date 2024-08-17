@@ -1,5 +1,5 @@
-import 'package:my_hand/models/sales/customer.dart';
-import 'package:my_hand/models/supply/client.dart';
+import 'package:my_hand/features/data/models/sales/customer.dart';
+import 'package:my_hand/features/data/models/supply/client.dart';
 
 class InventoryItem {
   final String name;

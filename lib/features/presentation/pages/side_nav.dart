@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:my_hand/screens/home_screen.dart';
-import 'package:my_hand/screens/splash_screen.dart';
-import 'package:my_hand/widgets/textbuilder.dart';
+import 'package:my_hand/features/presentation/pages/home_screen.dart';
+import 'package:my_hand/features/presentation/pages/splash_screen.dart';
+import 'package:my_hand/features/widgets/textbuilder.dart';
 
 class SideNav extends StatefulWidget {
   const SideNav({super.key});
@@ -62,8 +62,7 @@ class _SideNavState extends State<SideNav> {
                     Navigator.pop(context);
                     Navigator.pushAndRemoveUntil(
                         context,
-                        MaterialPageRoute(
-                            builder: (_) =>  const HomeScreen()),
+                        MaterialPageRoute(builder: (_) => const HomeScreen()),
                         (route) => false);
                   },
                   leading: Icon(
@@ -79,22 +78,22 @@ class _SideNavState extends State<SideNav> {
               },
             ),
             ListTile(
-                onTap: () {
-                  Navigator.pushAndRemoveUntil(
-                      context,
-                      MaterialPageRoute(builder: (_) => const Splash()),
-                      (route) => false);
-                },
-                leading: const Icon(
-                  Icons.power_settings_new,
-                  color: Colors.black,
-                ),
-                title: const TextBuilder(
-                  text: 'Log out',
-                  fontSize: 18.0,
-                  color: Colors.black,
-                ),
+              onTap: () {
+                Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute(builder: (_) => const Splash()),
+                    (route) => false);
+              },
+              leading: const Icon(
+                Icons.power_settings_new,
+                color: Colors.black,
               ),
+              title: const TextBuilder(
+                text: 'Log out',
+                fontSize: 18.0,
+                color: Colors.black,
+              ),
+            ),
           ],
         ),
       )),

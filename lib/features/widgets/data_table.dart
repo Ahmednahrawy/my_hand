@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:my_hand/models/product_model.dart';
+import 'package:my_hand/features/data/models/product_model.dart';
 
 
 class MyDataTable extends StatefulWidget {
