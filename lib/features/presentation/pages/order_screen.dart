@@ -35,9 +35,11 @@ class _OrderscreenState extends State<Orderscreen> {
   final TextEditingController _customerNameController = TextEditingController();
   final GlobalKey<FormState> _dropdownSearchKey = GlobalKey<FormState>();
   final _formKey = GlobalKey<FormState>();
+  final GlobalKey<FormState> _payKey = GlobalKey<FormState>();
   final _packageNumberController = TextEditingController();
   final _packageWeightController = TextEditingController();
   final _priceController = TextEditingController();
+  final _payController = TextEditingController();
   final List _productList = [
     'صعيدي',
     'أرضيات',
@@ -50,6 +52,7 @@ class _OrderscreenState extends State<Orderscreen> {
     'ارغاون',
     'عزاوي',
     'علف',
+    'دبس',
     'عجيزي',
     'حامض',
     'كلاماتا',
@@ -62,6 +65,7 @@ class _OrderscreenState extends State<Orderscreen> {
     'علب 700',
     'علب 1.4ك',
     'علب 1.6ك',
+    'شحن',
   ];
 
   String? _selectedProduct;
@@ -71,6 +75,8 @@ class _OrderscreenState extends State<Orderscreen> {
   void initState() {
     _packageWeightController.text = "2";
     _packageNumberController.text = "0";
+    _priceController.text = "0";
+    _payController.text = "0";
     super.initState();
   }
 
@@ -103,6 +109,13 @@ class _OrderscreenState extends State<Orderscreen> {
                     ? product.price
                     : (-1 * product.price)),
       );
+  double get _paid {
+    return double.tryParse(_payController.text) ?? 0.0;
+  }
+
+  double get _rest {
+    return ((_totalCost < 0) ? (-_totalCost) : _totalCost) - _paid;
+  }
 
   void _addProduct() {
     // final action =
@@ -123,7 +136,29 @@ class _OrderscreenState extends State<Orderscreen> {
       _weightController.clear();
       // _packageWeightController.clear();
       // _priceController.clear();
-      _packageNumberController.clear();
+      _packageNumberController.text = "0";
+      _selectDate(context); // Update the selected date when adding a product
+    }
+  }
+
+  // send invoice
+  void _sendInvoice() async {
+    if (_payKey.currentState!.validate()) {
+      final pdfDoc = await generatePDF(
+        PdfPageFormat.a4,
+        products,
+        _customerNameController.text,
+        _totalCost,
+        _paid,
+        _rest,
+      );
+      // Get a temporary directory path to save the PDF
+      final tempDir = await getTemporaryDirectory();
+      final filePath = '${tempDir.path}/${_customerNameController.text}.pdf';
+      // Write the PDF bytes to the temporary file
+      await File(filePath).writeAsBytes(pdfDoc);
+      await Share.shareXFiles([XFile(filePath)]);
+
       _selectDate(context); // Update the selected date when adding a product
     }
   }
@@ -153,32 +188,68 @@ class _OrderscreenState extends State<Orderscreen> {
           showModalBottomSheet(
             context: context,
             builder: (BuildContext context) {
-              return SizedBox(
-                width: screenSize.width,
-                height: 500,
-                child: Column(
-                  children: [
-                    addVerticalSpace(5),
-                    SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      child: MyDataTable(products: products),
+              return GestureDetector(
+                onTap: () => FocusScope.of(context).unfocus(),
+                child: SizedBox(
+                  width: screenSize.width,
+                  height: 500,
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.vertical,
+                    child: Column(
+                      children: [
+                        addVerticalSpace(5),
+                        SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          child: MyDataTable(
+                            products: products,
+                            isInModal: true,
+                          ),
+                        ),
+                        Column(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            Text(
+                              'إجالي المبلغ: $_totalCost  L.E',
+                              textDirection: TextDirection.rtl,
+                            ),
+                            Text(
+                              'التحصيل : $_paid L.E ',
+                              textDirection: TextDirection.rtl,
+                            ),
+                            Text(
+                              'الباقي: $_rest L.E',
+                              textDirection: TextDirection.rtl,
+                            ),
+                          ],
+                        ),
+                        addVerticalSpace(5),
+                        // paying
+                        Form(
+                          key: _payKey,
+                          child: TextFormField(
+                            controller: _payController,
+                            decoration: const InputDecoration(
+                              labelText: 'تحصيل',
+                              suffixText: 'L.E',
+                            ),
+                            keyboardType: TextInputType.number,
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Please enter price.';
+                              }
+                              return null;
+                            },
+                          ),
+                        ),
+
+                        addVerticalSpace(5),
+                        ElevatedButton(
+                            onPressed: _sendInvoice,
+                            child: const Text('إرسال')),
+                        addVerticalSpace(10),
+                      ],
                     ),
-                    TextButton(
-                        onPressed: () async {
-                          final pdfDoc = await generatePDF(
-                              PdfPageFormat.a4,
-                              products,
-                              _totalCost,
-                              _customerNameController.text);
-                          // Get a temporary directory path to save the PDF
-                          final tempDir = await getTemporaryDirectory();
-                          final filePath = '${tempDir.path}/invoice.pdf';
-                          // Write the PDF bytes to the temporary file
-                          await File(filePath).writeAsBytes(pdfDoc);
-                          await Share.shareXFiles([XFile(filePath)]);
-                        },
-                        child: const Text('Send'))
-                  ],
+                  ),
                 ),
               );
             },
@@ -203,322 +274,343 @@ class _OrderscreenState extends State<Orderscreen> {
             child: SingleChildScrollView(
               scrollDirection: Axis.vertical,
               padding: const EdgeInsets.all(5),
-              child: Form(
-                key: _formKey,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    // Customer name
-
-                    Card(
-                      child: TextFormField(
-                        controller: _customerNameController,
-                        decoration: const InputDecoration(
-                          labelText: "إسم العميل",
+              child: Column(
+                children: [
+                  Form(
+                    key: _formKey,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        // Customer name
+                        Card(
+                          child: TextFormField(
+                            controller: _customerNameController,
+                            decoration: const InputDecoration(
+                              labelText: "إسم العميل",
+                            ),
+                            validator: (value) {
+                              if (value == null ||
+                                  value.isEmpty ||
+                                  value.length < 5) {
+                                return 'Please enter at least 7 characters.';
+                              }
+                              return null;
+                            },
+                          ),
                         ),
-                        validator: (value) {
-                          if (value == null ||
-                              value.isEmpty ||
-                              value.length < 7) {
-                            return 'Please enter at least 7 characters.';
-                          }
-                          return null;
-                        },
-                      ),
-                    ),
 
-                    addVerticalSpace(5),
-                    // main activity buy,sell, store
-                    Card(
-                      child: Container(
-                        width: double.infinity,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        addVerticalSpace(5),
+                        // main activity buy,sell, store
+                        Card(
+                          child: Container(
+                            width: double.infinity,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                TextButton(
+                                  onPressed: () {
+                                    _activeTextButton('تخزين');
+                                    _action = 'تخزين';
+                                  },
+                                  child: Text('تخزين',
+                                      style: _textTheme.headlineSmall),
+                                  style: ButtonStyle(
+                                    foregroundColor:
+                                        WidgetStateProperty.resolveWith<Color>(
+                                      (Set<WidgetState> states) {
+                                        if (states
+                                            .contains(WidgetState.pressed)) {
+                                          // The button is pressed
+                                          return Theme.of(context)
+                                              .colorScheme
+                                              .secondary; // Change to the desired color when pressed
+                                        }
+                                        return Theme.of(context)
+                                            .colorScheme
+                                            .primary; // Default color
+                                      },
+                                    ),
+                                    backgroundColor:
+                                        WidgetStateProperty.resolveWith<Color>(
+                                      (Set<WidgetState> states) {
+                                        if (isStorageButtonPressed) {
+                                          // The button is pressed
+                                          return Theme.of(context)
+                                                      .colorScheme
+                                                      .brightness ==
+                                                  Brightness.light
+                                              ? Colors.deepOrange
+                                              : const Color.fromARGB(
+                                                  255, 36, 8, 69);
+                                        }
+                                        return Theme.of(context)
+                                                    .colorScheme
+                                                    .brightness ==
+                                                Brightness.light
+                                            ? Colors.orangeAccent
+                                            : const Color.fromARGB(255, 35, 34,
+                                                34); // Default color
+                                      },
+                                    ),
+                                  ),
+                                ),
+                                addHorizontalSpace(5),
+                                TextButton(
+                                  onPressed: () {
+                                    _activeTextButton('بـيع');
+                                    _action = 'بـيع';
+                                  },
+                                  child: Text('بـيع',
+                                      style: _textTheme.headlineSmall),
+                                  style: ButtonStyle(
+                                    foregroundColor:
+                                        WidgetStateProperty.resolveWith<Color>(
+                                      (Set<WidgetState> states) {
+                                        if (states
+                                            .contains(WidgetState.pressed)) {
+                                          // The button is pressed
+                                          return Theme.of(context)
+                                              .colorScheme
+                                              .secondary; // Change to the desired color when pressed
+                                        }
+                                        return Theme.of(context)
+                                            .colorScheme
+                                            .primary; // Default color
+                                      },
+                                    ),
+                                    backgroundColor:
+                                        WidgetStateProperty.resolveWith<Color>(
+                                      (Set<WidgetState> states) {
+                                        if (isSellButtonPressed) {
+                                          // The button is pressed
+                                          return Theme.of(context)
+                                                      .colorScheme
+                                                      .brightness ==
+                                                  Brightness.light
+                                              ? Colors.deepOrange
+                                              : const Color.fromARGB(
+                                                  255, 36, 8, 69);
+                                        }
+                                        return Theme.of(context)
+                                                    .colorScheme
+                                                    .brightness ==
+                                                Brightness.light
+                                            ? Colors.orangeAccent
+                                            : const Color.fromARGB(255, 35, 34,
+                                                34); // Default color
+                                      },
+                                    ),
+                                  ),
+                                ),
+                                addHorizontalSpace(5),
+                                TextButton(
+                                  onPressed: () {
+                                    _activeTextButton('شراء');
+                                    _action = 'شراء';
+                                  },
+                                  child: Text('شراء',
+                                      style: _textTheme.headlineSmall),
+                                  style: ButtonStyle(
+                                    foregroundColor:
+                                        WidgetStateProperty.resolveWith<Color>(
+                                      (Set<WidgetState> states) {
+                                        if (states
+                                            .contains(WidgetState.pressed)) {
+                                          // The button is pressed
+                                          return Theme.of(context)
+                                              .colorScheme
+                                              .secondary; // Change to the desired color when pressed
+                                        }
+                                        return Theme.of(context)
+                                            .colorScheme
+                                            .primary; // Default color
+                                      },
+                                    ),
+                                    backgroundColor:
+                                        WidgetStateProperty.resolveWith<Color>(
+                                      (Set<WidgetState> states) {
+                                        if (isPurchaseButtonPressed) {
+                                          // The button is pressed
+                                          return Theme.of(context)
+                                                      .colorScheme
+                                                      .brightness ==
+                                                  Brightness.light
+                                              ? Colors.deepOrange
+                                              : const Color.fromARGB(
+                                                  255, 36, 8, 69);
+                                        }
+                                        return Theme.of(context)
+                                                    .colorScheme
+                                                    .brightness ==
+                                                Brightness.light
+                                            ? Colors.orangeAccent
+                                            : const Color.fromARGB(255, 35, 34,
+                                                34); // Default color
+                                      },
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        // Product selection
+                        Row(
                           children: [
-                            TextButton(
-                              onPressed: () {
-                                _activeTextButton('تخزين');
-                                _action = 'تخزين';
-                              },
-                              child: Text('تخزين',
-                                  style: _textTheme.headlineSmall),
-                              style: ButtonStyle(
-                                foregroundColor:
-                                    WidgetStateProperty.resolveWith<Color>(
-                                  (Set<WidgetState> states) {
-                                    if (states.contains(WidgetState.pressed)) {
-                                      // The button is pressed
-                                      return Theme.of(context)
-                                          .colorScheme
-                                          .secondary; // Change to the desired color when pressed
-                                    }
-                                    return Theme.of(context)
-                                        .colorScheme
-                                        .primary; // Default color
-                                  },
+                            Flexible(
+                              flex: 2,
+                              child: DropdownSearch(
+                                key: _dropdownSearchKey,
+                                autoValidateMode:
+                                    AutovalidateMode.onUserInteraction,
+                                items: _productList,
+                                selectedItem: _selectedProduct,
+                                dropdownDecoratorProps:
+                                    const DropDownDecoratorProps(
+                                  dropdownSearchDecoration: InputDecoration(
+                                    labelText: 'المنتج',
+                                    suffixIcon: Icon(Icons.search),
+                                    hintText: 'Search',
+                                  ),
                                 ),
-                                backgroundColor:
-                                    WidgetStateProperty.resolveWith<Color>(
-                                  (Set<WidgetState> states) {
-                                    if (isStorageButtonPressed) {
-                                      // The button is pressed
-                                      return Theme.of(context)
-                                                  .colorScheme
-                                                  .brightness ==
-                                              Brightness.light
-                                          ? Colors.deepOrange
-                                          : const Color.fromARGB(
-                                              255, 36, 8, 69);
-                                    }
-                                    return Theme.of(context)
-                                                .colorScheme
-                                                .brightness ==
-                                            Brightness.light
-                                        ? Colors.orangeAccent
-                                        : const Color.fromARGB(
-                                            255, 35, 34, 34); // Default color
-                                  },
+                                popupProps: const PopupProps.bottomSheet(
+                                  bottomSheetProps: BottomSheetProps(
+                                    elevation: 16,
+                                    backgroundColor: Color(0xFFAADCEE),
+                                  ),
+                                  showSearchBox: true,
                                 ),
+                                onChanged: (value) {
+                                  setState(() {
+                                    // _productController.text = value;
+                                    _selectedProduct = value;
+                                  });
+                                },
                               ),
                             ),
-                            addHorizontalSpace(5),
-                            TextButton(
-                              onPressed: () {
-                                _activeTextButton('بـيع');
-                                _action = 'بـيع';
-                              },
-                              child:
-                                  Text('بـيع', style: _textTheme.headlineSmall),
-                              style: ButtonStyle(
-                                foregroundColor:
-                                    WidgetStateProperty.resolveWith<Color>(
-                                  (Set<WidgetState> states) {
-                                    if (states.contains(WidgetState.pressed)) {
-                                      // The button is pressed
-                                      return Theme.of(context)
-                                          .colorScheme
-                                          .secondary; // Change to the desired color when pressed
-                                    }
-                                    return Theme.of(context)
-                                        .colorScheme
-                                        .primary; // Default color
-                                  },
+                            // Weight
+                            Flexible(
+                              flex: 1,
+                              child: TextFormField(
+                                controller: _weightController,
+                                decoration: const InputDecoration(
+                                  labelText: 'الوزن أو العدد',
+                                  suffixText: 'kg',
                                 ),
-                                backgroundColor:
-                                    WidgetStateProperty.resolveWith<Color>(
-                                  (Set<WidgetState> states) {
-                                    if (isSellButtonPressed) {
-                                      // The button is pressed
-                                      return Theme.of(context)
-                                                  .colorScheme
-                                                  .brightness ==
-                                              Brightness.light
-                                          ? Colors.deepOrange
-                                          : const Color.fromARGB(
-                                              255, 36, 8, 69);
-                                    }
-                                    return Theme.of(context)
-                                                .colorScheme
-                                                .brightness ==
-                                            Brightness.light
-                                        ? Colors.orangeAccent
-                                        : const Color.fromARGB(
-                                            255, 35, 34, 34); // Default color
-                                  },
-                                ),
-                              ),
-                            ),
-                            addHorizontalSpace(5),
-                            TextButton(
-                              onPressed: () {
-                                _activeTextButton('شراء');
-                                _action = 'شراء';
-                              },
-                              child:
-                                  Text('شراء', style: _textTheme.headlineSmall),
-                              style: ButtonStyle(
-                                foregroundColor:
-                                    WidgetStateProperty.resolveWith<Color>(
-                                  (Set<WidgetState> states) {
-                                    if (states.contains(WidgetState.pressed)) {
-                                      // The button is pressed
-                                      return Theme.of(context)
-                                          .colorScheme
-                                          .secondary; // Change to the desired color when pressed
-                                    }
-                                    return Theme.of(context)
-                                        .colorScheme
-                                        .primary; // Default color
-                                  },
-                                ),
-                                backgroundColor:
-                                    WidgetStateProperty.resolveWith<Color>(
-                                  (Set<WidgetState> states) {
-                                    if (isPurchaseButtonPressed) {
-                                      // The button is pressed
-                                      return Theme.of(context)
-                                                  .colorScheme
-                                                  .brightness ==
-                                              Brightness.light
-                                          ? Colors.deepOrange
-                                          : const Color.fromARGB(
-                                              255, 36, 8, 69);
-                                    }
-                                    return Theme.of(context)
-                                                .colorScheme
-                                                .brightness ==
-                                            Brightness.light
-                                        ? Colors.orangeAccent
-                                        : const Color.fromARGB(
-                                            255, 35, 34, 34); // Default color
-                                  },
-                                ),
+                                keyboardType: TextInputType.number,
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return 'Please enter weight.';
+                                  }
+                                  return null;
+                                },
                               ),
                             ),
                           ],
                         ),
-                      ),
-                    ),
-                    // Product selection
-                    DropdownSearch(
-                      key: _dropdownSearchKey,
-                      autoValidateMode: AutovalidateMode.onUserInteraction,
-                      items: _productList,
-                      selectedItem: _selectedProduct,
-                      dropdownDecoratorProps: const DropDownDecoratorProps(
-                        dropdownSearchDecoration: InputDecoration(
-                          labelText: 'المنتج',
-                          suffixIcon: Icon(Icons.search),
-                          hintText: 'Search',
+                        // Package weight
+                        Card(
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              // package weight
+                              Flexible(
+                                flex: 2,
+                                child: TextFormField(
+                                  controller: _packageWeightController,
+                                  decoration: const InputDecoration(
+                                    labelText: 'وزن العبوة',
+                                    suffixText: 'kg',
+                                  ),
+                                  keyboardType: TextInputType.number,
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return 'أدخل وزن   \n العبوة الفارغة';
+                                    }
+                                    return null;
+                                  },
+                                ),
+                              ),
+                              addHorizontalSpace(10),
+                              // number of packages
+                              Flexible(
+                                flex: 2,
+                                child: TextFormField(
+                                  controller: _packageNumberController,
+                                  decoration: const InputDecoration(
+                                    labelText: 'عدد العبوات',
+                                  ),
+                                  inputFormatters: [
+                                    FilteringTextInputFormatter.digitsOnly
+                                  ],
+                                  keyboardType: TextInputType.number,
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return 'أدخل عدد العبوات أولا';
+                                    }
+                                    return null;
+                                  },
+                                ),
+                              ),
+                              // price
+                              Flexible(
+                                flex: 4,
+                                child: TextFormField(
+                                  controller: _priceController,
+                                  decoration: const InputDecoration(
+                                    labelText: 'السعر',
+                                    suffixText: 'L.E',
+                                  ),
+                                  keyboardType: TextInputType.number,
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return 'Please enter price.';
+                                    }
+                                    return null;
+                                  },
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
-                      popupProps: const PopupProps.bottomSheet(
-                        bottomSheetProps: BottomSheetProps(
-                          elevation: 16,
-                          backgroundColor: Color(0xFFAADCEE),
-                        ),
-                        showSearchBox: true,
-                      ),
-                      onChanged: (value) {
-                        setState(() {
-                          // _productController.text = value;
-                          _selectedProduct = value;
-                        });
-                      },
-                    ),
-                    // Package weight
-                    Card(
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: [
-                          // Weight
-                          Flexible(
-                            flex: 4,
-                            child: TextFormField(
-                              controller: _weightController,
-                              decoration: const InputDecoration(
-                                labelText: 'الوزن أو العدد',
-                                suffixText: 'kg',
-                              ),
-                              keyboardType: TextInputType.number,
-                              validator: (value) {
-                                if (value == null || value.isEmpty) {
-                                  return 'Please enter weight.';
-                                }
-                                return null;
-                              },
-                            ),
-                          ),
-                          addHorizontalSpace(10),
-                          // package weight
-                          Flexible(
-                            flex: 2,
-                            child: TextFormField(
-                              controller: _packageWeightController,
-                              decoration: const InputDecoration(
-                                labelText: 'وزن العبوة',
-                                suffixText: 'kg',
-                              ),
-                              keyboardType: TextInputType.number,
-                              validator: (value) {
-                                if (value == null || value.isEmpty) {
-                                  return 'أدخل وزن   \n العبوة الفارغة';
-                                }
-                                return null;
-                              },
-                            ),
-                          ),
-                          addHorizontalSpace(10),
-                          // number of packages
-                          Flexible(
-                            flex: 3,
-                            child: TextFormField(
-                              controller: _packageNumberController,
-                              decoration: const InputDecoration(
-                                labelText: 'عدد العبوات',
-                              ),
-                              inputFormatters: [
-                                FilteringTextInputFormatter.digitsOnly
-                              ],
-                              keyboardType: TextInputType.number,
-                              validator: (value) {
-                                if (value == null || value.isEmpty) {
-                                  return 'أدخل عدد العبوات أولا';
-                                }
-                                return null;
-                              },
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    // price
-                    TextFormField(
-                      controller: _priceController,
-                      decoration: const InputDecoration(
-                        labelText: 'السعر',
-                        suffixText: 'L.E',
-                      ),
-                      keyboardType: TextInputType.number,
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Please enter price.';
-                        }
-                        return null;
-                      },
-                    ),
-                    addVerticalSpace(10),
-                    // Add product button
-                    GradientButtonFb1(
-                      text: 'أضف منتج',
-                      onPressed: () {
-                        if (_formKey.currentState!.validate()) {
-                          _addProduct();
-                        }
-                      },
-                    ),
-                    addVerticalSpace(10),
-                    Text(
-                      formattedDate ?? 'أكمل بيانات المنتج أولا',
-                      style: const TextStyle(color: Colors.redAccent),
-                    ), //print date here
-                    addVerticalSpace(10),
-
-                    // Products table
-                    SingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
-                        child: MyDataTable(products: products)),
-
-                    // Total cost
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        Text('Total cost: $_totalCost L.E'),
+                        addVerticalSpace(10),
                       ],
                     ),
-                  ],
-                ),
+                  ),
+                  // Add product button
+                  GradientButtonFb1(
+                    text: 'أضف منتج',
+                    onPressed: () {
+                      if (_formKey.currentState!.validate()) {
+                        _addProduct();
+                      }
+                    },
+                  ),
+                  addVerticalSpace(10),
+                  Text(
+                    formattedDate ?? 'أكمل بيانات المنتج أولا',
+                    style: const TextStyle(color: Colors.redAccent),
+                  ), //print date here
+                  addVerticalSpace(10),
+
+                  // Products table
+                  SizedBox(
+                    width: screenSize.width,
+                    child: MyDataTable(
+                      products: products,
+                      isInModal: false,
+                    ),
+                  ),
+
+                  // Total cost
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      Text('Total cost: $_totalCost L.E'),
+                    ],
+                  ),
+                ],
               ),
             ),
           ),

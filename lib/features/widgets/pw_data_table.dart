@@ -3,14 +3,16 @@ import 'package:pdf/widgets.dart' as pw;
 
 class PdfMyDataTable extends pw.StatelessWidget {
   final List<Product> products;
+  final double totalCost;
 
-  PdfMyDataTable({required this.products});
+  PdfMyDataTable({required this.products, required this.totalCost});
 
   @override
   pw.Widget build(pw.Context context) {
     return pw.Table(
       border: pw.TableBorder.symmetric(
-          outside: const pw.BorderSide(width: 2), inside: const pw.BorderSide(width: 1)),
+          outside: const pw.BorderSide(width: 2),
+          inside: const pw.BorderSide(width: 1)),
       children: [
         pw.TableRow(
           children: [
@@ -27,6 +29,9 @@ class PdfMyDataTable extends pw.StatelessWidget {
                 textAlign: pw.TextAlign.center,
                 style: const pw.TextStyle(fontSize: 18)),
             pw.Text('عدد الفارغ',
+                textAlign: pw.TextAlign.center,
+                style: const pw.TextStyle(fontSize: 18)),
+            pw.Text('صافي الوزن',
                 textAlign: pw.TextAlign.center,
                 style: const pw.TextStyle(fontSize: 18)),
             pw.Text('السعر',
@@ -48,6 +53,9 @@ class PdfMyDataTable extends pw.StatelessWidget {
               pw.Text('${product.packageWeight} kg',
                   textAlign: pw.TextAlign.center),
               pw.Text(product.numberPackage.toString(),
+                  textAlign: pw.TextAlign.center),
+              pw.Text(
+                  '${(product.weight - (product.packageWeight * product.numberPackage))} kg',
                   textAlign: pw.TextAlign.center),
               pw.Text('${product.price} L.E', textAlign: pw.TextAlign.center),
               pw.Text(

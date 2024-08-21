@@ -16,7 +16,7 @@ class _HomeState extends State<Home> {
 
   List<Widget> tabs = [
     const HomeScreen(),
-    InvoiceScreen(products: [], totalCost: 10, customerName: "customerName"),
+    // InvoiceScreen(products: [], totalCost: 10, customerName: "customerName"),
   ];
 
   @override

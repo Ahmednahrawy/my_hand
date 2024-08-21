@@ -1,20 +1,22 @@
-import 'dart:io';
-
-import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:my_hand/features/widgets/pw_data_table.dart';
-// import 'package:open_file/open_file.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:pdf/pdf.dart';
-import 'package:printing/printing.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:pdf/widgets.dart';
 import 'package:my_hand/features/data/models/product_model.dart';
 
-Future<Uint8List> generatePDF(final PdfPageFormat format,
-    List<Product> products, final double totalCost, String customerName) async {
-  final doc = Document(title: 'فاتورة العميل', compress: true);
-
+Future<Uint8List> generatePDF(
+  final PdfPageFormat format,
+  List<Product> products,
+  String customerName,
+  final double totalCost,
+  final double paid,
+  final double rest,
+) async {
+  final doc = Document(
+    title: 'فاتورة العميل',
+    compress: true,
+  );
   final loadImage = pw.MemoryImage(
       (await rootBundle.load('assets/images/khayrat_siwa.png'))
           .buffer
@@ -63,7 +65,8 @@ Future<Uint8List> generatePDF(final PdfPageFormat format,
                   ),
                   pw.SizedBox(width: 70),
                   pw.BarcodeWidget(
-                      data: 'فاتورة العميل',
+                      data:
+                          'https://www.facebook.com/profile.php?id=100084492852878',
                       width: 40,
                       height: 40,
                       barcode: pw.Barcode.qrCode(),
@@ -88,7 +91,7 @@ Future<Uint8List> generatePDF(final PdfPageFormat format,
           child: pw.Container(
             height: 400,
             alignment: pw.Alignment.center,
-            child: PdfMyDataTable(products: products),
+            child: PdfMyDataTable(products: products, totalCost: totalCost),
           ),
         ),
         pw.SizedBox(height: 10),
@@ -97,6 +100,14 @@ Future<Uint8List> generatePDF(final PdfPageFormat format,
           children: [
             pw.Text('إجمالي الفاتورة : \n $totalCost L.E',
                 style: const pw.TextStyle(fontSize: 20)),
+            pw.Text(
+              'تحصيل : \n $paid',
+              style: const pw.TextStyle(fontSize: 20),
+            ),
+            pw.Text(
+              'الباقي : \n $rest',
+              style: const pw.TextStyle(fontSize: 20),
+            )
           ],
         ),
       ],
@@ -125,9 +136,9 @@ Future<pw.PageTheme> _myPageTheme(PdfPageFormat format) async {
     buildBackground: (final context) => pw.FullPage(
       ignoreMargins: true,
       child: pw.Watermark(
-        angle: 20,
+        angle: 340,
         child: pw.Opacity(
-          opacity: 0.35,
+          opacity: 0.3,
           child: pw.Image(
               alignment: pw.Alignment.center, loadImage, fit: pw.BoxFit.cover),
         ),
@@ -136,19 +147,19 @@ Future<pw.PageTheme> _myPageTheme(PdfPageFormat format) async {
   );
 }
 
-Future<void> saveAsFile(
-  final BuildContext context,
-  final LayoutCallback build,
-  final PdfPageFormat pageFormat,
-) async {
-  final bytes = await build(pageFormat);
-  final appDocDir = await getApplicationDocumentsDirectory();
-  final appDocPath = appDocDir.path;
-  final file = File('$appDocPath/document.pdf');
-  print('save as file ${file.path}...');
-  await file.writeAsBytes(bytes);
-  // await OpenFile.open(file.path);
-}
+// Future<void> saveAsFile(
+//   final BuildContext context,
+//   final LayoutCallback build,
+//   final PdfPageFormat pageFormat,
+// ) async {
+//   final bytes = await build(pageFormat);
+//   final appDocDir = await getApplicationDocumentsDirectory();
+//   final appDocPath = appDocDir.path;
+//   final file = File('$appDocPath/document.pdf');
+//   print('save as file ${file.path}...');
+//   await file.writeAsBytes(bytes);
+//   // await OpenFile.open(file.path);
+// }
 
 // void showPrintedToast(final BuildContext context) {
 //   ScaffoldMessenger.of(context).showSnackBar(
