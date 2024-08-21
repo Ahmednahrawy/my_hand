@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:my_hand/features/presentation/pages/order_screen.dart';
 import 'package:my_hand/features/presentation/pages/side_nav.dart';
 
-class HomeScreen extends HookConsumerWidget {
+class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
 
     return Scaffold(
       appBar: AppBar(
