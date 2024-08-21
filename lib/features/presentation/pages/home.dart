@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:my_hand/features/presentation/pages/home_screen.dart';
-import 'package:my_hand/features/presentation/pages/invoice_screen.dart';
 
 class Home extends StatefulWidget {
   final int initRoute;
@@ -16,7 +15,6 @@ class _HomeState extends State<Home> {
 
   List<Widget> tabs = [
     const HomeScreen(),
-    // InvoiceScreen(products: [], totalCost: 10, customerName: "customerName"),
   ];
 
   @override
