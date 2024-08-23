@@ -9,6 +9,7 @@ import 'package:my_hand/features/data/models/product_model.dart';
 
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:my_hand/core/util/utils.dart';
+import 'package:my_hand/features/presentation/pages/side_nav.dart';
 import 'package:my_hand/features/widgets/button.dart';
 import 'package:my_hand/features/widgets/data_table.dart';
 import 'package:path_provider/path_provider.dart';
@@ -180,7 +181,10 @@ class _OrderscreenState extends State<Orderscreen> {
     TextTheme _textTheme = Theme.of(context).textTheme;
     return Scaffold(
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-
+      appBar: AppBar(
+        title: const Text("إصدار فاتورة"),
+      ),
+      drawer: const SideNav(),
       extendBody: true,
       // Send data button
       floatingActionButton: FloatingActionButton(
