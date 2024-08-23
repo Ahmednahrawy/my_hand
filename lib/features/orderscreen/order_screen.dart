@@ -182,7 +182,10 @@ class _OrderscreenState extends State<Orderscreen> {
     return Scaffold(
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       appBar: AppBar(
-        title: const Text("إصدار فاتورة"),
+        title: const Text(
+          "إصدار فاتورة",
+          textDirection: TextDirection.rtl,
+        ),
       ),
       drawer: const SideNav(),
       extendBody: true,
