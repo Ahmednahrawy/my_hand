@@ -1,20 +1,19 @@
 import 'dart:io';
 
+import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-// import 'package:my_hand/screens/invoice_screen.dart';
-import 'package:my_hand/core/util/helper_date_price.dart';
-import 'package:my_hand/core/util/helper_widgets.dart';
-import 'package:my_hand/features/data/models/product_model.dart';
-
-import 'package:dropdown_search/dropdown_search.dart';
-import 'package:my_hand/core/util/utils.dart';
-import 'package:my_hand/features/presentation/pages/side_nav.dart';
-import 'package:my_hand/features/widgets/button.dart';
-import 'package:my_hand/features/widgets/data_table.dart';
+import 'package:my_hand/core/helpers/spacing.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:pdf/pdf.dart';
 import 'package:share_plus/share_plus.dart';
+
+import 'package:my_hand/core/helpers/helper_date_price.dart';
+import 'package:my_hand/core/helpers/utils.dart';
+import 'package:my_hand/features/data/models/product_model.dart';
+import 'package:my_hand/features/presentation/pages/side_nav.dart';
+import 'package:my_hand/features/widgets/button.dart';
+import 'package:my_hand/features/widgets/data_table.dart';
 
 class Orderscreen extends StatefulWidget {
   const Orderscreen({super.key});
@@ -81,17 +80,6 @@ class _OrderscreenState extends State<Orderscreen> {
     super.initState();
   }
 
-  // void submitForm(List<Product> products) {
-  //   Navigator.of(context).push(
-  //     MaterialPageRoute(
-  //       builder: (ctx) => InvoiceScreen(
-  //         products: products,
-  //         totalCost: _totalCost,
-  //         customerName: '${_customerNameController.text}',
-  //       ),
-  //     ),
-  //   );
-  // }
 
   Future<void> _selectDate(BuildContext context) async {
     DateTime selectedDate = DateTime.now();
@@ -120,6 +108,22 @@ class _OrderscreenState extends State<Orderscreen> {
 
   void _addProduct() {
     // final action =
+    // if (_selectedProduct == null) {
+    //   // Show an error message or dialog to inform the user
+    //   ScaffoldMessenger.of(context).showSnackBar(
+    //     const SnackBar(content: Text('Please select a product')),
+    //   );
+    //   return;
+    // }
+
+    // if (_action == null) {
+    //   // Show an error message or dialog to inform the user
+    //   ScaffoldMessenger.of(context).showSnackBar(
+    //     const SnackBar(
+    //         content: Text('Please select an action (تخزين, بـيع, شراء)')),
+    //   );
+    //   return;
+    // }
     if (_formKey.currentState!.validate()) {
       setState(() {
         products.add(
@@ -204,7 +208,7 @@ class _OrderscreenState extends State<Orderscreen> {
                     scrollDirection: Axis.vertical,
                     child: Column(
                       children: [
-                        addVerticalSpace(5),
+                        verticalSpace(5),
                         SingleChildScrollView(
                           scrollDirection: Axis.horizontal,
                           child: MyDataTable(
@@ -229,7 +233,7 @@ class _OrderscreenState extends State<Orderscreen> {
                             ),
                           ],
                         ),
-                        addVerticalSpace(5),
+                        verticalSpace(5),
                         // paying
                         Form(
                           key: _payKey,
@@ -249,11 +253,11 @@ class _OrderscreenState extends State<Orderscreen> {
                           ),
                         ),
 
-                        addVerticalSpace(5),
+                        verticalSpace(5),
                         ElevatedButton(
                             onPressed: _sendInvoice,
                             child: const Text('إرسال')),
-                        addVerticalSpace(10),
+                        verticalSpace(10),
                       ],
                     ),
                   ),
@@ -268,10 +272,6 @@ class _OrderscreenState extends State<Orderscreen> {
         ),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(50)),
       ),
-      // bottomNavigationBar: const BottomAppBar(
-      //   height: 10,
-      //   shape: CircularNotchedRectangle(),
-      // ),
       body: GestureDetector(
         onTap: () => FocusScope.of(context).unfocus(),
         child: Center(
@@ -306,7 +306,7 @@ class _OrderscreenState extends State<Orderscreen> {
                           ),
                         ),
 
-                        addVerticalSpace(5),
+                        verticalSpace(5),
                         // main activity buy,sell, store
                         Card(
                           child: Container(
@@ -361,7 +361,7 @@ class _OrderscreenState extends State<Orderscreen> {
                                     ),
                                   ),
                                 ),
-                                addHorizontalSpace(5),
+                                horizontalSpace(5),
                                 TextButton(
                                   onPressed: () {
                                     _activeTextButton('بـيع');
@@ -409,7 +409,7 @@ class _OrderscreenState extends State<Orderscreen> {
                                     ),
                                   ),
                                 ),
-                                addHorizontalSpace(5),
+                                horizontalSpace(5),
                                 TextButton(
                                   onPressed: () {
                                     _activeTextButton('شراء');
@@ -539,7 +539,7 @@ class _OrderscreenState extends State<Orderscreen> {
                                   },
                                 ),
                               ),
-                              addHorizontalSpace(10),
+                              horizontalSpace(10),
                               // number of packages
                               Flexible(
                                 flex: 2,
@@ -581,7 +581,7 @@ class _OrderscreenState extends State<Orderscreen> {
                             ],
                           ),
                         ),
-                        addVerticalSpace(10),
+                        verticalSpace(10),
                       ],
                     ),
                   ),
@@ -594,12 +594,12 @@ class _OrderscreenState extends State<Orderscreen> {
                       }
                     },
                   ),
-                  addVerticalSpace(10),
+                  verticalSpace(10),
                   Text(
                     formattedDate ?? 'أكمل بيانات المنتج أولا',
                     style: const TextStyle(color: Colors.redAccent),
                   ), //print date here
-                  addVerticalSpace(10),
+                  verticalSpace(10),
 
                   // Products table
                   SizedBox(
