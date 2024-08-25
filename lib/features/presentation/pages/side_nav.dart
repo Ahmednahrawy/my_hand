@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:my_hand/features/orderscreen/order_screen.dart';
+import 'package:my_hand/features/orderscreen/ui/order_screen.dart';
 import 'package:my_hand/features/widgets/textbuilder.dart';
 
 class SideNav extends StatefulWidget {
