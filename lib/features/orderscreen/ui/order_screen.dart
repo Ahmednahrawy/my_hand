@@ -315,12 +315,9 @@ class _OrderscreenState extends State<Orderscreen> {
                             return Flexible(
                               flex: 1,
                               child: Opacity(
-                                opacity: _action == action ? 1.0 : 0.8,
+                                opacity: _action == action ? 1.0 : 0.7,
                                 child: AppTextButton(
                                   borderRadius: 9,
-                                  backgroundColor: _action == action
-                                      ? ColorsManager.darkBlue
-                                      : ColorsManager.mainBlue,
                                   onPressed: () {
                                     _activeTextButton(action);
                                   },
@@ -467,6 +464,7 @@ class _OrderscreenState extends State<Orderscreen> {
                       isInModal: false,
                     ),
                   ),
+
                   // Total cost
                   Row(
                     mainAxisAlignment: MainAxisAlignment.end,
