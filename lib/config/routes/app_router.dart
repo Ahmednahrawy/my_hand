@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:my_hand/config/routes/routes.dart';
-import 'package:my_hand/features/orderscreen/order_screen.dart';
+import 'package:my_hand/features/orderscreen/ui/order_screen.dart';
 import 'package:my_hand/features/presentation/pages/side_nav.dart';
 
 class AppRouter {

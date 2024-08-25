@@ -1,24 +1,5 @@
 {
     "cSpell.words": [
-        "Autovalidate",
-        "cupertino",
-        "Orderscreen",
-        "riverpod",
-        "unfocus",
-        "أرضيات",
-        "إدارة",
-        "البيانات",
-        "السعر",
-        "العملية",
-        "العميل",
-        "المنتج",
-        "الوزن",
-        "شراء",
-        "صعيدي",
-        "فاتورة",
-        "مساعد",
-        "منتج",
-        "مهدي"
-    ],
-    "cmake.sourceDirectory": "E:/flutter_Projects/my_hand/linux/flutter"
+        "Orderscreen"
+    ]
 }
