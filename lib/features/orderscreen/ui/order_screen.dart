@@ -128,10 +128,12 @@ class _OrderscreenState extends State<Orderscreen> {
         _totalCost,
         _paid,
         _rest,
+        formattedDate,
       );
       // Get a temporary directory path to save the PDF
       final tempDir = await getTemporaryDirectory();
-      final filePath = '${tempDir.path}/${_customerNameController.text}.pdf';
+      final filePath =
+          '${tempDir.path}/${_customerNameController.text}-${formattedDate}.pdf';
       // Write the PDF bytes to the temporary file
       await File(filePath).writeAsBytes(pdfDoc);
       await Share.shareXFiles([XFile(filePath)]);
@@ -226,7 +228,6 @@ class _OrderscreenState extends State<Orderscreen> {
                               controller: _payController,
                               labelText: 'تحصيل',
                               suffixText: 'L.E',
-                              
                               validator: (value) {
                                 if (value == null || value.isEmpty) {
                                   return 'Please enter price.';
@@ -255,7 +256,7 @@ class _OrderscreenState extends State<Orderscreen> {
           );
         },
         child: const Icon(
-          Icons.picture_as_pdf_outlined,
+          Icons.share_sharp,
           size: 28,
         ),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(50)),

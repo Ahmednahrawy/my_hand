@@ -1,4 +1,5 @@
 import 'package:flutter/services.dart';
+import 'package:my_hand/core/helpers/spacing.dart';
 import 'package:my_hand/features/widgets/pw_data_table.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
@@ -12,6 +13,7 @@ Future<Uint8List> generatePDF(
   final double totalCost,
   final double paid,
   final double rest,
+  final String? formattedDate,
 ) async {
   final doc = Document(
     title: 'فاتورة العميل',
@@ -78,12 +80,24 @@ Future<Uint8List> generatePDF(
           ),
         ),
         pw.Center(
-          child: pw.Text(
-            ' إسم العميل: $customerName ',
-            textDirection: pw.TextDirection.rtl,
-            textAlign: pw.TextAlign.center,
-            style: pw.TextStyle(
-                fontSize: 30, fontWeight: pw.FontWeight.bold, font: ttf),
+          child: pw.Column(
+            children: [
+              pw.Text(
+                ' إسم العميل: $customerName ',
+                textDirection: pw.TextDirection.rtl,
+                textAlign: pw.TextAlign.center,
+                style: pw.TextStyle(
+                    fontSize: 30, fontWeight: pw.FontWeight.bold, font: ttf),
+              ),
+              pw.SizedBox(height: 5),
+              pw.Text(
+                '  التاريخ: $formattedDate ',
+                textDirection: pw.TextDirection.rtl,
+                textAlign: pw.TextAlign.center,
+                style: pw.TextStyle(
+                    fontSize: 20, fontWeight: pw.FontWeight.normal, font: ttf),
+              ),
+            ],
           ),
         ),
         pw.Align(
