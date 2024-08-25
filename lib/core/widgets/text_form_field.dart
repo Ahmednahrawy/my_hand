@@ -86,6 +86,7 @@ class AppTextFormField extends StatelessWidget {
       ),
       obscureText: isObscureText ?? false,
       style: TextStyles.font14DarkBlueMedium,
+      
       keyboardType: keyboardType ?? TextInputType.number,
       inputFormatters: labelText == 'عدد العبوات'
           ? [FilteringTextInputFormatter.digitsOnly]

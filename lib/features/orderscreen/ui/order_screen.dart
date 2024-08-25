@@ -2,13 +2,15 @@ import 'dart:io';
 
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
-import 'package:my_hand/core/helpers/product_list_constants.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:pdf/pdf.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
+import 'package:my_hand/config/theme/colors.dart';
 import 'package:my_hand/config/theme/styles.dart';
 import 'package:my_hand/core/helpers/helper_date_price.dart';
+import 'package:my_hand/core/helpers/product_list_constants.dart';
 import 'package:my_hand/core/helpers/spacing.dart';
 import 'package:my_hand/core/helpers/utils.dart';
 import 'package:my_hand/core/widgets/text_button.dart';
@@ -79,7 +81,7 @@ class _OrderscreenState extends State<Orderscreen> {
     return ((_totalCost < 0) ? (-_totalCost) : _totalCost) - _paid;
   }
 
-  void _showSnackBar(String message) {
+  void _showToast(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text(message)),
     );
@@ -87,11 +89,11 @@ class _OrderscreenState extends State<Orderscreen> {
 
   void _addProduct() {
     if (_selectedProduct == null) {
-      _showSnackBar('Please select a product');
+      _showToast('Please select a product');
       return;
     }
     if (_action == null) {
-      _showSnackBar('Please select an action (تخزين, بـيع, شراء)');
+      _showToast('Please select an action (تخزين, بـيع, شراء)');
       return;
     }
     if (_formKey.currentState!.validate()) {
@@ -177,6 +179,7 @@ class _OrderscreenState extends State<Orderscreen> {
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           showModalBottomSheet(
+            backgroundColor: ColorsManager.moreLighterGray,
             context: context,
             builder: (BuildContext context) {
               return GestureDetector(
@@ -217,23 +220,31 @@ class _OrderscreenState extends State<Orderscreen> {
                         // paying
                         Form(
                           key: _payKey,
-                          child: AppTextFormField(
-                            controller: _payController,
-                            labelText: 'تحصيل',
-                            suffixText: 'L.E',
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Please enter price.';
-                              }
-                              return null;
-                            },
+                          child: Directionality(
+                            textDirection: TextDirection.rtl,
+                            child: AppTextFormField(
+                              controller: _payController,
+                              labelText: 'تحصيل',
+                              suffixText: 'L.E',
+                              
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'Please enter price.';
+                                }
+                                return null;
+                              },
+                            ),
                           ),
                         ),
 
-                        verticalSpace(5),
-                        ElevatedButton(
-                            onPressed: _sendInvoice,
-                            child: const Text('إرسال')),
+                        verticalSpace(10),
+                        AppTextButton(
+                          onPressed: _sendInvoice,
+                          buttonText: 'إرسال',
+                          textStyle: TextStyles.font18DarkBlueBold,
+                          buttonWidth: screenSize.width * 0.5,
+                          backgroundColor: ColorsManager.lightBlue,
+                        ),
                         verticalSpace(10),
                       ],
                     ),
@@ -267,53 +278,55 @@ class _OrderscreenState extends State<Orderscreen> {
                       children: [
                         // Customer name
                         Card(
-                          child: AppTextFormField(
-                            controller: _customerNameController,
-                            labelText: 'إسم العميل',
-                            keyboardType: TextInputType.name,
-                            validator: (value) {
-                              print("Validating: $value");
-                              if (value == null ||
-                                  value.isEmpty ||
-                                  value.length < 5) {
-                                return 'Please enter at least 5 characters.';
-                              }
-                              return null;
-                            },
+                          child: Directionality(
+                            textDirection: TextDirection.rtl,
+                            child: AppTextFormField(
+                              controller: _customerNameController,
+                              labelText: 'إسم العميل',
+                              keyboardType: TextInputType.name,
+                              validator: (value) {
+                                print("Validating: $value");
+                                if (value == null ||
+                                    value.isEmpty ||
+                                    value.length < 5) {
+                                  return 'Please enter at least 5 characters.';
+                                }
+                                return null;
+                              },
+                            ),
                           ),
                         ),
                         verticalSpace(5),
                         // main activity buy,sell, store
-                        Card(
-                          child: Container(
-                            width: double.infinity,
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              children: actions.map((action) {
-                                return Opacity(
-                                  opacity: _action == action ? 1.0 : 0.4,
-                                  child: TextButton(
-                                      onPressed: () {
-                                        _activeTextButton(action);
-                                      },
-                                      child: Text(
-                                        action,
-                                        style: TextStyle(
-                                          color: _action == action
-                                              ? Colors.black
-                                              : Colors.grey,
-                                          backgroundColor: _action == action
-                                              ? Colors.yellow
-                                              : Colors.transparent,
-                                        ),
-                                      )),
-                                );
-                              }).toList(),
-                            ),
-                          ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: actions.map((action) {
+                            return Flexible(
+                              flex: 1,
+                              child: Opacity(
+                                opacity: _action == action ? 1.0 : 0.8,
+                                child: AppTextButton(
+                                  borderRadius: 9,
+                                  backgroundColor: _action == action
+                                      ? ColorsManager.darkBlue
+                                      : ColorsManager.mainBlue,
+                                  onPressed: () {
+                                    _activeTextButton(action);
+                                  },
+                                  buttonWidth: screenSize.width * 0.28,
+                                  buttonHeight: 12,
+                                  verticalPadding: 2,
+                                  buttonText: action,
+                                  textStyle: TextStyles.font16WhiteSemiBold,
+                                ),
+                              ),
+                            );
+                          }).toList(),
                         ),
+                        verticalSpace(10),
                         // Product selection
                         Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
                             Flexible(
                               flex: 2,
@@ -363,58 +376,64 @@ class _OrderscreenState extends State<Orderscreen> {
                             ),
                           ],
                         ),
+                        verticalSpace(10),
                         // Package weight
                         Card(
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            crossAxisAlignment: CrossAxisAlignment.end,
-                            children: [
-                              // package weight
-                              Flexible(
-                                flex: 2,
-                                child: AppTextFormField(
-                                  controller: _packageWeightController,
-                                  labelText: 'وزن العبوة',
-                                  suffixText: 'kg',
-                                  validator: (value) {
-                                    if (value == null || value.isEmpty) {
-                                      return 'أدخل وزن   \n العبوة الفارغة';
-                                    }
-                                    return null;
-                                  },
+                          color: ColorsManager.white,
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(
+                                vertical: 10.w, horizontal: 5.w),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              children: [
+                                // package weight
+                                Flexible(
+                                  flex: 2,
+                                  child: AppTextFormField(
+                                    controller: _packageWeightController,
+                                    labelText: 'وزن العبوة',
+                                    suffixText: 'kg',
+                                    validator: (value) {
+                                      if (value == null || value.isEmpty) {
+                                        return 'أدخل وزن   \n العبوة الفارغة';
+                                      }
+                                      return null;
+                                    },
+                                  ),
                                 ),
-                              ),
-                              horizontalSpace(10),
-                              // number of packages
-                              Flexible(
-                                flex: 2,
-                                child: AppTextFormField(
-                                  controller: _packageNumberController,
-                                  labelText: 'عدد العبوات',
-                                  validator: (value) {
-                                    if (value == null || value.isEmpty) {
-                                      return 'أدخل عدد العبوات أولا';
-                                    }
-                                    return null;
-                                  },
+                                horizontalSpace(1.w),
+                                // number of packages
+                                Flexible(
+                                  flex: 2,
+                                  child: AppTextFormField(
+                                    controller: _packageNumberController,
+                                    labelText: 'عدد العبوات',
+                                    validator: (value) {
+                                      if (value == null || value.isEmpty) {
+                                        return 'أدخل عدد العبوات أولا';
+                                      }
+                                      return null;
+                                    },
+                                  ),
                                 ),
-                              ),
-                              // price
-                              Flexible(
-                                flex: 3,
-                                child: AppTextFormField(
-                                  controller: _priceController,
-                                  labelText: 'السعر',
-                                  suffixText: 'L.E',
-                                  validator: (value) {
-                                    if (value == null || value.isEmpty) {
-                                      return 'Please enter price.';
-                                    }
-                                    return null;
-                                  },
+                                // price
+                                Flexible(
+                                  flex: 3,
+                                  child: AppTextFormField(
+                                    controller: _priceController,
+                                    labelText: 'السعر',
+                                    suffixText: 'L.E',
+                                    validator: (value) {
+                                      if (value == null || value.isEmpty) {
+                                        return 'Please enter price.';
+                                      }
+                                      return null;
+                                    },
+                                  ),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
                         ),
                         verticalSpace(10),
