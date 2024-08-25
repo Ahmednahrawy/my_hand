@@ -20,7 +20,7 @@ Future<Uint8List> generatePDF(
     compress: true,
   );
   final loadImage = pw.MemoryImage(
-      (await rootBundle.load('assets/images/khayrat_logo.png'))
+      (await rootBundle.load('assets/images/khayrat_logoo.png'))
           .buffer
           .asUint8List());
   final arabicFont = await rootBundle.load("assets/fonts/Almarai-Regular.ttf");
@@ -135,7 +135,7 @@ Future<pw.PageTheme> _myPageTheme(PdfPageFormat format) async {
   final ttf = pw.Font.ttf(arabicFont);
 
   final loadImage = pw.MemoryImage(
-      (await rootBundle.load('assets/images/khayrat_logo.png'))
+      (await rootBundle.load('assets/images/khayrat_logoo.png'))
           .buffer
           .asUint8List());
   return pw.PageTheme(

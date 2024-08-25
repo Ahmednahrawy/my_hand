@@ -2,10 +2,10 @@ import 'dart:io';
 
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:pdf/pdf.dart';
 import 'package:share_plus/share_plus.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import 'package:my_hand/config/theme/colors.dart';
 import 'package:my_hand/config/theme/styles.dart';
@@ -114,31 +114,44 @@ class _OrderscreenState extends State<Orderscreen> {
       // _packageWeightController.clear();
       // _priceController.clear();
       _packageNumberController.text = "0";
-      _selectDate(context); // Update the selected date when adding a product
     }
   }
 
   // send invoice
   void _sendInvoice() async {
     if (_payKey.currentState!.validate()) {
-      final pdfDoc = await generatePDF(
-        PdfPageFormat.a4,
-        products,
-        _customerNameController.text,
-        _totalCost,
-        _paid,
-        _rest,
-        formattedDate,
-      );
-      // Get a temporary directory path to save the PDF
-      final tempDir = await getTemporaryDirectory();
-      final filePath =
-          '${tempDir.path}/${_customerNameController.text}-${formattedDate}.pdf';
-      // Write the PDF bytes to the temporary file
-      await File(filePath).writeAsBytes(pdfDoc);
-      await Share.shareXFiles([XFile(filePath)]);
-
-      _selectDate(context); // Update the selected date when adding a product
+      try {
+        final pdfDoc = await generatePDF(
+          PdfPageFormat.a4,
+          products,
+          _customerNameController.text,
+          _totalCost,
+          _paid,
+          _rest,
+          formattedDate,
+        );
+        // Get a temporary directory path to save the PDF
+        final tempDir = await getTemporaryDirectory();
+        final filePath =
+            '${tempDir.path}/${_customerNameController.text}-${formattedDate}.pdf';
+        final file = File(filePath);
+        await file.writeAsBytes(pdfDoc);
+        final result = await Share.shareXFiles([XFile(filePath)]);
+        if (result.status == ShareResultStatus.success) {
+          _customerNameController.clear();
+          _packageNumberController.clear();
+          _packageWeightController.clear();
+          _priceController.clear();
+          _payController.clear();
+          _weightController.clear();
+        }
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to generate or share invoice: $e'),
+          ),
+        );
+      }
     }
   }
 
@@ -170,9 +183,9 @@ class _OrderscreenState extends State<Orderscreen> {
     return Scaffold(
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       appBar: AppBar(
-        title: const Text(
+        title: Text(
           "إصدار فاتورة",
-          textDirection: TextDirection.rtl,
+          style: TextStyles.font20MainBlueBold,
         ),
       ),
       drawer: const SideNav(),
@@ -222,19 +235,16 @@ class _OrderscreenState extends State<Orderscreen> {
                         // paying
                         Form(
                           key: _payKey,
-                          child: Directionality(
-                            textDirection: TextDirection.rtl,
-                            child: AppTextFormField(
-                              controller: _payController,
-                              labelText: 'تحصيل',
-                              suffixText: 'L.E',
-                              validator: (value) {
-                                if (value == null || value.isEmpty) {
-                                  return 'Please enter price.';
-                                }
-                                return null;
-                              },
-                            ),
+                          child: AppTextFormField(
+                            controller: _payController,
+                            labelText: 'تحصيل',
+                            suffixText: 'L.E',
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Please enter price.';
+                              }
+                              return null;
+                            },
                           ),
                         ),
 
@@ -242,9 +252,9 @@ class _OrderscreenState extends State<Orderscreen> {
                         AppTextButton(
                           onPressed: _sendInvoice,
                           buttonText: 'إرسال',
-                          textStyle: TextStyles.font18DarkBlueBold,
+                          textStyle: TextStyles.font18WhiteMedium,
                           buttonWidth: screenSize.width * 0.5,
-                          backgroundColor: ColorsManager.lightBlue,
+                          backgroundColor: ColorsManager.gray,
                         ),
                         verticalSpace(10),
                       ],
@@ -449,12 +459,6 @@ class _OrderscreenState extends State<Orderscreen> {
                     buttonWidth: screenSize.width * 0.6,
                   ),
                   verticalSpace(10),
-                  Text(
-                    formattedDate ?? 'أكمل بيانات المنتج أولا',
-                    style: const TextStyle(color: Colors.redAccent),
-                  ), //print date here
-                  verticalSpace(10),
-
                   // Products table
                   SizedBox(
                     width: screenSize.width,
@@ -463,7 +467,6 @@ class _OrderscreenState extends State<Orderscreen> {
                       isInModal: false,
                     ),
                   ),
-
                   // Total cost
                   Row(
                     mainAxisAlignment: MainAxisAlignment.end,

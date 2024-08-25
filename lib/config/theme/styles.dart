@@ -3,18 +3,26 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:my_hand/config/theme/colors.dart';
 import 'package:my_hand/config/theme/font_weight_helper.dart';
 
-
 class TextStyles {
+  static TextStyle font32BlueBold = TextStyle(
+    fontSize: 32.sp,
+    fontWeight: FontWeightHelper.bold,
+    color: ColorsManager.mainBlue,
+  );
   static TextStyle font24BlackBold = TextStyle(
     fontSize: 24.sp,
     fontWeight: FontWeightHelper.bold,
     color: ColorsManager.black,
   );
-
-  static TextStyle font32BlueBold = TextStyle(
-    fontSize: 32.sp,
+  static TextStyle font24BlueBold = TextStyle(
+    fontSize: 24.sp,
     fontWeight: FontWeightHelper.bold,
     color: ColorsManager.mainBlue,
+  );
+  static TextStyle font20MainBlueBold = TextStyle(
+    fontSize: 20.sp,
+    fontWeight: FontWeightHelper.bold,
+    color: ColorsManager.blue,
   );
 
   static TextStyle font13BlueSemiBold = TextStyle(
@@ -33,12 +41,6 @@ class TextStyles {
     fontSize: 13.sp,
     fontWeight: FontWeightHelper.regular,
     color: ColorsManager.darkBlue,
-  );
-
-  static TextStyle font24BlueBold = TextStyle(
-    fontSize: 24.sp,
-    fontWeight: FontWeightHelper.bold,
-    color: ColorsManager.mainBlue,
   );
 
   static TextStyle font16WhiteSemiBold = TextStyle(
