@@ -3,7 +3,7 @@ import 'package:my_hand/config/routes/app_router.dart';
 import 'package:my_hand/config/theme/colors.dart';
 import 'package:my_hand/core/helpers/spacing.dart';
 import 'package:my_hand/features/orderscreen/ui/order_screen.dart';
-import 'package:my_hand/features/widgets/textbuilder.dart';
+import 'package:my_hand/core/widgets/textbuilder.dart';
 import 'package:my_hand/my_app.dart';
 
 class SideNav extends StatefulWidget {
@@ -82,7 +82,7 @@ class _SideNavState extends State<SideNav> {
                     title: isCollapse
                         ? null
                         : TextBuilder(
-                            text: drawer.sideDrawer[i].title,
+                            text: drawer.sideDrawer[i].title!,
                             fontSize: 18.0,
                             color: ColorsManager.black,
                           ),

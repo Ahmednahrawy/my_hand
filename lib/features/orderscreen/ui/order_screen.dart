@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:my_hand/features/drawer/side_nav.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:pdf/pdf.dart';
 import 'package:share_plus/share_plus.dart';
@@ -16,8 +17,7 @@ import 'package:my_hand/core/helpers/utils.dart';
 import 'package:my_hand/core/widgets/text_button.dart';
 import 'package:my_hand/core/widgets/text_form_field.dart';
 import 'package:my_hand/features/data/models/product_model.dart';
-import 'package:my_hand/features/presentation/pages/side_nav.dart';
-import 'package:my_hand/features/widgets/data_table.dart';
+import 'package:my_hand/features/orderscreen/ui/widgets/data_table.dart';
 
 class Orderscreen extends StatefulWidget {
   const Orderscreen({super.key});
@@ -134,15 +134,7 @@ class _OrderscreenState extends State<Orderscreen> {
             '${tempDir.path}/${_customerNameController.text}-${formattedDate}.pdf';
         final file = File(filePath);
         await file.writeAsBytes(pdfDoc);
-        final result = await Share.shareXFiles([XFile(filePath)]);
-        if (result.status == ShareResultStatus.success) {
-          _customerNameController.clear();
-          _packageNumberController.clear();
-          _packageWeightController.clear();
-          _priceController.clear();
-          _payController.clear();
-          _weightController.clear();
-        }
+        await Share.shareXFiles([XFile(filePath)]);
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -160,19 +152,19 @@ class _OrderscreenState extends State<Orderscreen> {
     });
   }
 
-  // @override
-  // void dispose() {
-  //   _customerNameController.dispose();
-  //   _dropdownSearchKey.currentState?.dispose();
-  //   _formKey.currentState?.dispose();
-  //   _payKey.currentState?.dispose();
-  //   _packageNumberController.dispose();
-  //   _packageWeightController.dispose();
-  //   _priceController.dispose();
-  //   _payController.dispose();
-  //   _weightController.dispose();
-  //   super.dispose();
-  // }
+  @override
+  void dispose() {
+    _customerNameController.dispose();
+    _dropdownSearchKey.currentState?.dispose();
+    _formKey.currentState?.dispose();
+    _payKey.currentState?.dispose();
+    _packageNumberController.dispose();
+    _packageWeightController.dispose();
+    _priceController.dispose();
+    _payController.dispose();
+    _weightController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -312,20 +304,19 @@ class _OrderscreenState extends State<Orderscreen> {
                           children: actions.map((action) {
                             return Flexible(
                               flex: 1,
-                              child: Opacity(
-                                opacity: _action == action ? 1.0 : 0.7,
-                                child: AppTextButton(
-                                  borderRadius: 9,
-                                  onPressed: () {
-                                    _activeTextButton(action);
-                                  },
-                                  buttonWidth: screenSize.width * 0.28,
-                                  buttonHeight: 12,
-                                  verticalPadding: 2,
-                                  buttonText: action,
-                                  backgroundColor: ColorsManager.mainBlue,
-                                  textStyle: TextStyles.font16WhiteSemiBold,
-                                ),
+                              child: AppTextButton(
+                                borderRadius: 9,
+                                onPressed: () {
+                                  _activeTextButton(action);
+                                },
+                                buttonWidth: screenSize.width * 0.28,
+                                buttonHeight: 12,
+                                verticalPadding: 2,
+                                buttonText: action,
+                                backgroundColor: _action == action
+                                    ? ColorsManager.lavander
+                                    : ColorsManager.mainBlue,
+                                textStyle: TextStyles.font16WhiteSemiBold,
                               ),
                             );
                           }).toList(),

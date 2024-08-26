@@ -1,5 +1,5 @@
 import 'package:flutter/services.dart';
-import 'package:my_hand/features/widgets/pw_data_table.dart';
+import 'package:my_hand/features/orderscreen/ui/widgets/pw_data_table.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:pdf/widgets.dart';

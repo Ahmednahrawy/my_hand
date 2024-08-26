@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class TextBuilder extends StatelessWidget {
-  final String? text;
+  final String text;
   final double? fontSize;
   final Color? color;
   final FontWeight? fontWeight;
@@ -16,7 +16,7 @@ class TextBuilder extends StatelessWidget {
   final FontStyle? fontStyle;
   const TextBuilder({
     Key? key,
-    this.text,
+    required this.text,
     this.fontSize,
     this.color,
     this.textOverflow,
