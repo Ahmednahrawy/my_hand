@@ -88,12 +88,12 @@ class _OrderscreenState extends State<Orderscreen> {
   }
 
   void _addProduct() {
-    if (_selectedProduct == null) {
-      _showToast('Please select a product');
-      return;
-    }
     if (_action == null) {
       _showToast('Please select an action (تخزين, بـيع, شراء)');
+      return;
+    }
+    if (_selectedProduct == null) {
+      _showToast('Please select a product');
       return;
     }
     if (_formKey.currentState!.validate()) {
@@ -109,12 +109,10 @@ class _OrderscreenState extends State<Orderscreen> {
           ),
         );
       });
-      // _productController.clear();
       _weightController.clear();
-      // _packageWeightController.clear();
-      // _priceController.clear();
       _packageNumberController.text = "0";
     }
+    _selectDate(context);
   }
 
   // send invoice
@@ -162,19 +160,19 @@ class _OrderscreenState extends State<Orderscreen> {
     });
   }
 
-  @override
-  void dispose() {
-    _customerNameController.dispose();
-    _dropdownSearchKey.currentState?.dispose();
-    _formKey.currentState?.dispose();
-    _payKey.currentState?.dispose();
-    _packageNumberController.dispose();
-    _packageWeightController.dispose();
-    _priceController.dispose();
-    _payController.dispose();
-    _weightController.dispose();
-    super.dispose();
-  }
+  // @override
+  // void dispose() {
+  //   _customerNameController.dispose();
+  //   _dropdownSearchKey.currentState?.dispose();
+  //   _formKey.currentState?.dispose();
+  //   _payKey.currentState?.dispose();
+  //   _packageNumberController.dispose();
+  //   _packageWeightController.dispose();
+  //   _priceController.dispose();
+  //   _payController.dispose();
+  //   _weightController.dispose();
+  //   super.dispose();
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -325,6 +323,7 @@ class _OrderscreenState extends State<Orderscreen> {
                                   buttonHeight: 12,
                                   verticalPadding: 2,
                                   buttonText: action,
+                                  backgroundColor: ColorsManager.mainBlue,
                                   textStyle: TextStyles.font16WhiteSemiBold,
                                 ),
                               ),
@@ -453,6 +452,7 @@ class _OrderscreenState extends State<Orderscreen> {
                     onPressed: _addProduct,
                     buttonText: 'أضف منتج',
                     textStyle: TextStyles.font16WhiteSemiBold,
+                    backgroundColor: ColorsManager.mainBlue,
                     buttonWidth: screenSize.width * 0.6,
                   ),
                   verticalSpace(10),
