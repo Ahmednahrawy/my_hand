@@ -133,10 +133,6 @@ Future<pw.PageTheme> _myPageTheme(PdfPageFormat format) async {
   final arabicFont = await rootBundle.load("assets/fonts/Almarai-Regular.ttf");
   final ttf = pw.Font.ttf(arabicFont);
 
-  final loadImage = pw.MemoryImage(
-      (await rootBundle.load('assets/images/khayrat_logoo.png'))
-          .buffer
-          .asUint8List());
   return pw.PageTheme(
     pageFormat: PdfPageFormat.a4,
     theme: pw.ThemeData.withFont(
@@ -146,17 +142,6 @@ Future<pw.PageTheme> _myPageTheme(PdfPageFormat format) async {
         horizontal: 1 * PdfPageFormat.cm, vertical: 0.5 * PdfPageFormat.cm),
     textDirection: pw.TextDirection.rtl,
     orientation: pw.PageOrientation.portrait,
-    buildBackground: (final context) => pw.FullPage(
-      ignoreMargins: true,
-      child: pw.Watermark(
-        angle: 340,
-        child: pw.Opacity(
-          opacity: 0.3,
-          child: pw.Image(
-              alignment: pw.Alignment.center, loadImage, fit: pw.BoxFit.cover),
-        ),
-      ),
-    ),
   );
 }
 
