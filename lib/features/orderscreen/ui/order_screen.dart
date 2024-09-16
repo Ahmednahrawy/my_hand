@@ -4,6 +4,7 @@ import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:my_hand/features/drawer/side_nav.dart';
+import 'package:my_hand/features/orderscreen/ui/widgets/customer_name.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:pdf/pdf.dart';
 import 'package:share_plus/share_plus.dart';
@@ -35,7 +36,7 @@ class _OrderscreenState extends State<Orderscreen> {
   final List<String> actions = ['تخزين', 'بـيع', 'شراء'];
   String? _action;
   String? buttonType;
-  final TextEditingController _customerNameController = TextEditingController();
+  String? _customerName;
   final GlobalKey<FormState> _dropdownSearchKey = GlobalKey<FormState>();
   final _formKey = GlobalKey<FormState>();
   final _payKey = GlobalKey<FormState>();
@@ -43,7 +44,7 @@ class _OrderscreenState extends State<Orderscreen> {
   final _packageWeightController = TextEditingController();
   final _priceController = TextEditingController();
   final _payController = TextEditingController();
-  final List _productList = ProductListConstants.productList;
+  final List<String> _productList = ProductListConstants.productList;
 
   String? _selectedProduct;
   final _weightController = TextEditingController();
@@ -87,6 +88,13 @@ class _OrderscreenState extends State<Orderscreen> {
     );
   }
 
+  // This function will be passed to the Autocomplete widget as a callback
+  void _handleCustomerSelection(String? customerName) {
+    setState(() {
+      _customerName = customerName; // Store the selected customer name
+    });
+  }
+
   void _addProduct() {
     if (_action == null) {
       _showToast('Please select an action (تخزين, بـيع, شراء)');
@@ -122,7 +130,7 @@ class _OrderscreenState extends State<Orderscreen> {
         final pdfDoc = await generatePDF(
           PdfPageFormat.a4,
           products,
-          _customerNameController.text,
+          _customerName!,
           _totalCost,
           _paid,
           _rest,
@@ -131,7 +139,7 @@ class _OrderscreenState extends State<Orderscreen> {
         // Get a temporary directory path to save the PDF
         final tempDir = await getTemporaryDirectory();
         final filePath =
-            '${tempDir.path}/${_customerNameController.text}-${formattedDate}.pdf';
+            '${tempDir.path}/${_customerName}-${formattedDate}.pdf';
         final file = File(filePath);
         await file.writeAsBytes(pdfDoc);
         await Share.shareXFiles([XFile(filePath)]);
@@ -154,7 +162,6 @@ class _OrderscreenState extends State<Orderscreen> {
 
   @override
   void dispose() {
-    _customerNameController.dispose();
     _dropdownSearchKey.currentState?.dispose();
     _formKey.currentState?.dispose();
     _payKey.currentState?.dispose();
@@ -279,22 +286,8 @@ class _OrderscreenState extends State<Orderscreen> {
                       children: [
                         // Customer name
                         Card(
-                          child: Directionality(
-                            textDirection: TextDirection.rtl,
-                            child: AppTextFormField(
-                              controller: _customerNameController,
-                              labelText: 'إسم العميل',
-                              keyboardType: TextInputType.name,
-                              validator: (value) {
-                                print("Validating: $value");
-                                if (value == null ||
-                                    value.isEmpty ||
-                                    value.length < 5) {
-                                  return 'Please enter at least 5 characters.';
-                                }
-                                return null;
-                              },
-                            ),
+                          child: CustomerNameAutoComplete(
+                            onCustomerSelected: _handleCustomerSelection,
                           ),
                         ),
                         verticalSpace(5),
@@ -328,15 +321,15 @@ class _OrderscreenState extends State<Orderscreen> {
                           children: [
                             Flexible(
                               flex: 2,
-                              child: DropdownSearch(
+                              child: DropdownSearch<String>(
                                 key: _dropdownSearchKey,
                                 autoValidateMode:
                                     AutovalidateMode.onUserInteraction,
-                                items: _productList,
+                                items: (filter, infiniteScrollProps) =>
+                                    _productList,
                                 selectedItem: _selectedProduct,
-                                dropdownDecoratorProps:
-                                    const DropDownDecoratorProps(
-                                  dropdownSearchDecoration: InputDecoration(
+                                decoratorProps: const DropDownDecoratorProps(
+                                  decoration: InputDecoration(
                                     labelText: 'المنتج',
                                     suffixIcon: Icon(Icons.search),
                                     hintText: 'Search',
@@ -344,7 +337,7 @@ class _OrderscreenState extends State<Orderscreen> {
                                 ),
                                 popupProps: const PopupProps.bottomSheet(
                                   bottomSheetProps: BottomSheetProps(
-                                    elevation: 16,
+                                    elevation: 6,
                                     backgroundColor: Color(0xFFAADCEE),
                                   ),
                                   showSearchBox: true,
