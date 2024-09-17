@@ -210,11 +210,30 @@ class _CustomerNameAutoCompleteState extends State<CustomerNameAutoComplete> {
           child: ListView.builder(
             itemBuilder: (BuildContext context, int index) {
               final option = customers.elementAt(index);
-              return ListTile(
-                title: Text(option),
-                onTap: () {
-                  onSelected(option);
+              return Dismissible(
+                key: Key(option),
+                direction: DismissDirection.endToStart,
+                background: Container(
+                  color: ColorsManager.red,
+                  alignment: Alignment.centerRight,
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: const Icon(Icons.delete, color: Colors.white),
+                ),
+                onDismissed: (direction) {
+                  // Handle what happens when an item is dismissed
+                  setState(() {
+                    _customers.remove(option); // Remove the item from the list
+                  });
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('$option has been dismissed')),
+                  );
                 },
+                child: ListTile(
+                  title: Text(option),
+                  onTap: () {
+                    onSelected(option);
+                  },
+                ),
               );
             },
             itemCount: customers.length,
