@@ -410,7 +410,7 @@ class _OrderscreenState extends State<Orderscreen> {
                                 ),
                                 // price
                                 Flexible(
-                                  flex: 3,
+                                  flex: 4,
                                   child: AppTextFormField(
                                     controller: _priceController,
                                     labelText: 'السعر',

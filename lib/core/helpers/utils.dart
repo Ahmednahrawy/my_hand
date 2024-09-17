@@ -19,7 +19,7 @@ Future<Uint8List> generatePDF(
     compress: true,
   );
   final loadImage = pw.MemoryImage(
-      (await rootBundle.load('assets/images/khayrat_logoo.png'))
+      (await rootBundle.load('assets/images/khayray-logo-test-min.png'))
           .buffer
           .asUint8List());
   final arabicFont = await rootBundle.load("assets/fonts/Almarai-Regular.ttf");
