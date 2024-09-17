@@ -19,6 +19,9 @@ class AppTextFormField extends StatelessWidget {
   final String? labelText;
   final String? suffixText;
   final TextInputType? keyboardType;
+  final FocusNode? focusNode;
+  final Function()? onEditingComplete;
+
 
   const AppTextFormField({
     super.key,
@@ -36,12 +39,16 @@ class AppTextFormField extends StatelessWidget {
     this.labelText,
     this.suffixText,
     this.keyboardType,
+    this.focusNode,
+    this.onEditingComplete,
   });
 
   @override
   Widget build(BuildContext context) {
     return TextFormField(
       controller: controller,
+      focusNode: focusNode,
+      onEditingComplete: onEditingComplete,
       decoration: InputDecoration(
         isDense: true,
         contentPadding: contentPadding ??
@@ -86,7 +93,6 @@ class AppTextFormField extends StatelessWidget {
       ),
       obscureText: isObscureText ?? false,
       style: TextStyles.font14DarkBlueMedium,
-      
       keyboardType: keyboardType ?? TextInputType.number,
       inputFormatters: labelText == 'عدد العبوات'
           ? [FilteringTextInputFormatter.digitsOnly]

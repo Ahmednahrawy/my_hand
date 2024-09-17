@@ -33,7 +33,7 @@ class TextBuilder extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Text(
-      text!,
+      text,
       style: GoogleFonts.lato(
         fontSize: fontSize,
         color: color,

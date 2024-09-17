@@ -11,7 +11,7 @@ class CustomerScreen extends StatelessWidget {
       ),
       body: Padding(
         padding: EdgeInsets.all(10),
-        child: ListView.builder(itemBuilder: itemBuilder),
+        child: ListView.builder(itemBuilder: (context, index) => Text(''),),
       ),
     );
   }
