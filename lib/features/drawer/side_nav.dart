@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:my_hand/config/routes/app_router.dart';
+import 'package:my_hand/config/routes/routes.dart';
 import 'package:my_hand/config/theme/colors.dart';
 import 'package:my_hand/core/helpers/spacing.dart';
-import 'package:my_hand/features/orderscreen/ui/order_screen.dart';
 import 'package:my_hand/core/widgets/textbuilder.dart';
 import 'package:my_hand/my_app.dart';
 
@@ -69,11 +69,7 @@ class _SideNavState extends State<SideNav> {
                   return ListTile(
                     onTap: () {
                       Navigator.pop(context);
-                      Navigator.pushAndRemoveUntil(
-                          context,
-                          MaterialPageRoute(
-                              builder: (_) => const Orderscreen()),
-                          (route) => false);
+                      _navigateToRoute(context, i);
                     },
                     leading: Icon(
                       drawer.sideDrawer[i].icon,
@@ -120,6 +116,25 @@ class _SideNavState extends State<SideNav> {
       ),
     );
   }
+}
+
+void _navigateToRoute(BuildContext context, int index) {
+  String routeName;
+  switch (index) {
+    case 0:
+      routeName = Routes.orderScreen;
+      break;
+    case 1:
+      routeName = Routes.customerScreen;
+      break;
+    case 2:
+      routeName = Routes.customerScreen;
+      break;
+    // Handle additional cases if necessary
+    default:
+      routeName = Routes.orderScreen;
+  }
+  Navigator.pushNamed(context, routeName);
 }
 
 class DrawersController {
