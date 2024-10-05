@@ -123,7 +123,7 @@ Future<Uint8List> generatePDF(
         pw.Align(
           alignment: pw.Alignment.centerLeft,
           child: pw.Container(
-            height: 400,
+            // height: 400,
             alignment: pw.Alignment.center,
             child: PdfMyDataTable(products: products, totalCost: totalCost),
           ),
@@ -145,6 +145,8 @@ Future<Uint8List> generatePDF(
           ],
         ),
       ],
+      // maxPages: 100,
+        
     ),
   );
   return doc.save();
