@@ -1,9 +1,16 @@
+import 'dart:io';
+
+import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
-import 'package:my_hand/features/orderscreen/ui/widgets/pw_data_table.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:pdf/widgets.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
 import 'package:my_hand/features/data/models/product_model.dart';
+import 'package:my_hand/features/orderscreen/ui/widgets/pw_data_table.dart';
 
 Future<Uint8List> generatePDF(
   final PdfPageFormat format,
@@ -25,6 +32,12 @@ Future<Uint8List> generatePDF(
   final arabicFont = await rootBundle.load("assets/fonts/Almarai-Regular.ttf");
   final ttf = pw.Font.ttf(arabicFont);
 
+  // Retrieve the last serial number and increment it
+  final SharedPreferences prefs = await SharedPreferences.getInstance();
+  int invoiceSerial = (prefs.getInt('invoice_serial') ?? 0) + 1;
+  await prefs.setInt(
+      'invoice_serial', invoiceSerial); // Store the new serial number
+
   final pageTheme = await _myPageTheme(format);
   doc.addPage(
     MultiPage(
@@ -33,7 +46,7 @@ Future<Uint8List> generatePDF(
           alignment: pw.Alignment.topLeft,
           loadImage,
           fit: pw.BoxFit.contain,
-          width: 140),
+          width: 100),
       build: (final context) => [
         pw.Container(
           padding: const pw.EdgeInsets.only(left: 30, bottom: 20),
@@ -41,7 +54,7 @@ Future<Uint8List> generatePDF(
             crossAxisAlignment: pw.CrossAxisAlignment.center,
             mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
             children: [
-              pw.Padding(padding: const pw.EdgeInsets.only(top: 20)),
+              pw.Padding(padding: const pw.EdgeInsets.only(top: 10)),
               pw.Row(
                 crossAxisAlignment: pw.CrossAxisAlignment.start,
                 mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
@@ -53,7 +66,7 @@ Future<Uint8List> generatePDF(
                             textDirection: pw.TextDirection.rtl),
                         pw.Text('ت : ', textDirection: pw.TextDirection.rtl),
                       ]),
-                  pw.SizedBox(width: 50),
+                  pw.SizedBox(width: 40),
                   pw.Column(
                     crossAxisAlignment: pw.CrossAxisAlignment.start,
                     children: [
@@ -61,15 +74,15 @@ Future<Uint8List> generatePDF(
                         'مهدي إسماعيل قدورة',
                         textDirection: pw.TextDirection.rtl,
                       ),
-                      pw.Text('+20 109 094 0051'),
+                      pw.Text('+20 1557435130'),
                     ],
                   ),
                   pw.SizedBox(width: 70),
                   pw.BarcodeWidget(
                       data:
                           'https://www.facebook.com/profile.php?id=100084492852878',
-                      width: 40,
-                      height: 40,
+                      width: 50,
+                      height: 50,
                       barcode: pw.Barcode.qrCode(),
                       drawText: false),
                   pw.Padding(padding: pw.EdgeInsets.zero)
@@ -81,6 +94,14 @@ Future<Uint8List> generatePDF(
         pw.Center(
           child: pw.Column(
             children: [
+              pw.Text(
+                '  رقم الفاتورة: $invoiceSerial ',
+                textDirection: pw.TextDirection.rtl,
+                textAlign: pw.TextAlign.center,
+                style: pw.TextStyle(
+                    fontSize: 20, fontWeight: pw.FontWeight.normal, font: ttf),
+              ),
+              pw.SizedBox(height: 5),
               pw.Text(
                 ' إسم العميل: $customerName ',
                 textDirection: pw.TextDirection.rtl,
@@ -144,27 +165,3 @@ Future<pw.PageTheme> _myPageTheme(PdfPageFormat format) async {
     orientation: pw.PageOrientation.portrait,
   );
 }
-
-// Future<void> saveAsFile(
-//   final BuildContext context,
-//   final LayoutCallback build,
-//   final PdfPageFormat pageFormat,
-// ) async {
-//   final bytes = await build(pageFormat);
-//   final appDocDir = await getApplicationDocumentsDirectory();
-//   final appDocPath = appDocDir.path;
-//   final file = File('$appDocPath/document.pdf');
-//   print('save as file ${file.path}...');
-//   await file.writeAsBytes(bytes);
-//   // await OpenFile.open(file.path);
-// }
-
-// void showPrintedToast(final BuildContext context) {
-//   ScaffoldMessenger.of(context).showSnackBar(
-//       const SnackBar(content: Text('document printed successfully')));
-// }
-
-// void showSharedToast(final BuildContext context) {
-//   ScaffoldMessenger.of(context).showSnackBar(
-//       const SnackBar(content: Text('document shared successfully')));
-// }

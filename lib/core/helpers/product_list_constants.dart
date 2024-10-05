@@ -1,6 +1,6 @@
 abstract class ProductListConstants {
   static List<String> productList = [
-    'صعيدي',
+    'تمر سيوي',
     'أرضيات',
     'منشر',
     'فريحي 0',
@@ -8,6 +8,7 @@ abstract class ProductListConstants {
     'فريحي 2',
     'فريحي 3',
     'بشاير',
+    'مجدول',
     'نوادر',
     'ارغاون',
     'عزاوي',
@@ -24,8 +25,11 @@ abstract class ProductListConstants {
     'زيتون زيت',
     'زيت',
     'زيت لتر زجاج',
+    'زيت نصف لتر زجاج',
     'زيت لتر بلاستيك',
+    'زيت نصف لتر بلاستيك',
     'زيت لتر جركن',
+    'زيت نصف لتر جركن',
     'علب 10ك',
     'علب 5ك',
     'علب 2.4ك',

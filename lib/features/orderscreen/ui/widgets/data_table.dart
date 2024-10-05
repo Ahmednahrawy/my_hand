@@ -23,36 +23,18 @@ class _MyDataTableState extends State<MyDataTable> {
   Widget build(BuildContext context) {
     return DataTable(
       columns: [
-        const DataColumn(label: Text('العملية')),
-        const DataColumn(label: Text('المنتج')),
-        const DataColumn(
-          label: Text('الوزن'),
-        ),
-        if (widget.isInModal) const DataColumn(label: Text("عدد العبوات")),
-        if (widget.isInModal) const DataColumn(label: Text("صافي الوزن")),
-        const DataColumn(label: Text('السعر')),
-        const DataColumn(label: Text('إجمالي')),
-        if (widget.isInModal) const DataColumn(label: Text('حذف')),
+        if (widget.isInModal) _buildDataColumn('حذف'),
+        _buildDataColumn('العملية'),
+        _buildDataColumn('المنتج'),
+        _buildDataColumn('الوزن'),
+        if (widget.isInModal) _buildDataColumn("عدد العبوات"),
+        if (widget.isInModal) _buildDataColumn("صافي الوزن"),
+        _buildDataColumn('السعر'),
+        _buildDataColumn('إجمالي'),
       ],
       rows: widget.products.map((product) {
         return DataRow(
           cells: [
-            DataCell(Center(child: Text(product.action.toString()))),
-            DataCell(
-              Center(child: Text(product.name.toString())),
-            ),
-            DataCell(Center(child: Text('${product.weight}  kg'))),
-            if (widget.isInModal)
-              DataCell(Center(child: Text('${product.numberPackage}'))),
-            if (widget.isInModal)
-              DataCell(Center(
-                  child: Text(
-                      '${(product.weight - (product.packageWeight * product.numberPackage))}  kg'))),
-            DataCell(Center(child: Text('${product.price} L.E'))),
-            DataCell(Center(
-              child: Text(
-                  '${(product.weight - (product.packageWeight * product.numberPackage)) * product.price} L.E'),
-            )),
             if (widget.isInModal)
               DataCell(
                 Center(
@@ -63,6 +45,16 @@ class _MyDataTableState extends State<MyDataTable> {
                   ),
                 ),
               ),
+            _buildDataCell(product.action.toString()),
+            _buildDataCell(product.name.toString()),
+            _buildDataCell('${product.weight}  kg'),
+            if (widget.isInModal) _buildDataCell('${product.numberPackage}'),
+            if (widget.isInModal)
+              _buildDataCell(
+                  '${(product.weight - (product.packageWeight * product.numberPackage))}  kg'),
+            _buildDataCell('${product.price} L.E'),
+            _buildDataCell(
+                '${(product.weight - (product.packageWeight * product.numberPackage)) * product.price} L.E'),
           ],
           onSelectChanged: (selected) {
             // Handle row selection if needed
@@ -82,4 +74,18 @@ class _MyDataTableState extends State<MyDataTable> {
       showCheckboxColumn: false,
     );
   }
+}
+
+_buildDataCell(String text) {
+  return DataCell(
+    Center(
+      child: Text(text),
+    ),
+  );
+}
+
+_buildDataColumn(String text) {
+  return DataColumn(
+    label: Text(text),
+  );
 }

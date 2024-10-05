@@ -3,8 +3,6 @@ import 'dart:io';
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:my_hand/features/drawer/side_nav.dart';
-import 'package:my_hand/features/orderscreen/ui/widgets/customer_name.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:pdf/pdf.dart';
 import 'package:share_plus/share_plus.dart';
@@ -18,6 +16,8 @@ import 'package:my_hand/core/helpers/utils.dart';
 import 'package:my_hand/core/widgets/text_button.dart';
 import 'package:my_hand/core/widgets/text_form_field.dart';
 import 'package:my_hand/features/data/models/product_model.dart';
+import 'package:my_hand/features/drawer/side_nav.dart';
+import 'package:my_hand/features/orderscreen/ui/widgets/customer_name.dart';
 import 'package:my_hand/features/orderscreen/ui/widgets/data_table.dart';
 
 class Orderscreen extends StatefulWidget {
@@ -29,10 +29,11 @@ class Orderscreen extends StatefulWidget {
 
 class _OrderscreenState extends State<Orderscreen> {
   String? formattedDate;
-  final List<Product> products = [];
+  String? formattedTime;
   // format date now
   late DateTime selectedDate;
 
+  final List<Product> products = [];
   final List<String> actions = ['تخزين', 'بـيع', 'شراء'];
   String? _action;
   String? buttonType;
@@ -60,9 +61,8 @@ class _OrderscreenState extends State<Orderscreen> {
 
   Future<void> _selectDate(BuildContext context) async {
     DateTime selectedDate = DateTime.now();
-    setState(() {
-      formattedDate = Utils.formatDate(selectedDate);
-    });
+    formattedDate = Utils.formatDate(selectedDate);
+    formattedTime = Utils.formateTimeNow(selectedDate);
   }
 
   double get _totalCost => products.fold(
@@ -84,7 +84,11 @@ class _OrderscreenState extends State<Orderscreen> {
 
   void _showToast(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message)),
+      SnackBar(
+        content: Text(message),
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+      ),
     );
   }
 
@@ -125,6 +129,7 @@ class _OrderscreenState extends State<Orderscreen> {
 
   // send invoice
   void _sendInvoice() async {
+    _selectDate(context);
     if (_payKey.currentState!.validate()) {
       try {
         final pdfDoc = await generatePDF(
@@ -139,16 +144,13 @@ class _OrderscreenState extends State<Orderscreen> {
         // Get a temporary directory path to save the PDF
         final tempDir = await getTemporaryDirectory();
         final filePath =
-            '${tempDir.path}/${_customerName}-${formattedDate}.pdf';
+            '${tempDir.path}/${_customerName}-${formattedDate}-${formattedTime}.pdf';
         final file = File(filePath);
         await file.writeAsBytes(pdfDoc);
         await Share.shareXFiles([XFile(filePath)]);
       } catch (e) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Failed to generate or share invoice: $e'),
-          ),
-        );
+        Navigator.of(context).pop();
+        _showToast('فشل إرسال فاتورة: $e');
       }
     }
   }
@@ -320,7 +322,7 @@ class _OrderscreenState extends State<Orderscreen> {
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
                             Flexible(
-                              flex: 2,
+                              flex: 3,
                               child: DropdownSearch<String>(
                                 key: _dropdownSearchKey,
                                 autoValidateMode:
@@ -335,11 +337,25 @@ class _OrderscreenState extends State<Orderscreen> {
                                     hintText: 'Search',
                                   ),
                                 ),
-                                popupProps: const PopupProps.bottomSheet(
-                                  bottomSheetProps: BottomSheetProps(
-                                    elevation: 6,
-                                    backgroundColor: Color(0xFFAADCEE),
-                                  ),
+                                popupProps: PopupProps.menu(
+                                  fit: FlexFit.tight,
+                                  itemBuilder:
+                                      (context, item, isDisabled, isSelected) {
+                                    return Container(
+                                      decoration: BoxDecoration(
+                                        border: Border(
+                                          bottom: BorderSide(
+                                            color: ColorsManager
+                                                .lightGray, // Border color
+                                            width: 1.0, // Border width
+                                          ),
+                                        ),
+                                      ),
+                                      child: ListTile(
+                                        title: Text(item),
+                                      ),
+                                    );
+                                  },
                                   showSearchBox: true,
                                 ),
                                 onChanged: (value) {
@@ -352,11 +368,23 @@ class _OrderscreenState extends State<Orderscreen> {
                             ),
                             // Weight
                             Flexible(
-                              flex: 2,
+                              flex: 4,
                               child: AppTextFormField(
                                 controller: _weightController,
                                 labelText: 'الوزن أو العدد',
                                 suffixText: 'kg',
+                                suffixIcon: IconButton(
+                                  onPressed: () {
+                                    _weightController
+                                        .clear(); // Clear the input when the clear icon is pressed
+                                    setState(() {
+                                      _weightController.text = '';
+                                    });
+                                  },
+                                  icon: _weightController.text == ''
+                                      ? Icon(null)
+                                      : Icon(Icons.clear),
+                                ),
                                 validator: (value) {
                                   if (value == null || value.isEmpty) {
                                     return 'Please enter weight.';
@@ -410,11 +438,23 @@ class _OrderscreenState extends State<Orderscreen> {
                                 ),
                                 // price
                                 Flexible(
-                                  flex: 4,
+                                  flex: 5,
                                   child: AppTextFormField(
                                     controller: _priceController,
                                     labelText: 'السعر',
                                     suffixText: 'L.E',
+                                    suffixIcon: IconButton(
+                                      onPressed: () {
+                                        _priceController
+                                            .clear(); // Clear the input when the clear icon is pressed
+                                        setState(() {
+                                          _priceController.text = '';
+                                        });
+                                      },
+                                      icon: _priceController.text == ''
+                                          ? Icon(null)
+                                          : Icon(Icons.clear),
+                                    ),
                                     validator: (value) {
                                       if (value == null || value.isEmpty) {
                                         return 'Please enter price.';
@@ -448,7 +488,6 @@ class _OrderscreenState extends State<Orderscreen> {
                       isInModal: false,
                     ),
                   ),
-
                   // Total cost
                   Row(
                     mainAxisAlignment: MainAxisAlignment.end,
