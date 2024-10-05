@@ -36,12 +36,8 @@ class _CustomerNameAutoCompleteState extends State<CustomerNameAutoComplete> {
           content: Text('Error loading suggestions: $e ###'),
         ),
       );
-      print(
-          'load noot done ###################################################');
-
-      // Handle the error accordingly, e.g., show a snackbar to the user
     }
-    print('load done ###################################################');
+    print('load done #########################');
   }
 
   // Save suggestions to SharedPreferences
@@ -55,10 +51,8 @@ class _CustomerNameAutoCompleteState extends State<CustomerNameAutoComplete> {
           content: Text('Error saving suggestions: $e'),
         ),
       );
-      print(
-          'save noot done ###################################################');
     }
-    print('save done ###################################################');
+    print('save done ##############################');
   }
 
   // Add new suggestion if it doesn't exist
@@ -77,8 +71,6 @@ class _CustomerNameAutoCompleteState extends State<CustomerNameAutoComplete> {
           content: Text('Error adding suggestions: $e'),
         ),
       );
-      print(
-          'add noot done ###################################################');
     }
   }
 
@@ -101,6 +93,7 @@ class _CustomerNameAutoCompleteState extends State<CustomerNameAutoComplete> {
         _controller.text = selection;
         widget.onCustomerSelected(_selectedCustomerName);
         _saveSuggestions();
+        FocusScope.of(context).unfocus();
       },
       fieldViewBuilder: (context, controller, focusNode, onFieldSubmitted) {
         focusNode.addListener(() {
@@ -131,8 +124,7 @@ class _CustomerNameAutoCompleteState extends State<CustomerNameAutoComplete> {
                   _selectedCustomerName = value;
                   widget.onCustomerSelected(_selectedCustomerName);
                 });
-                print(
-                    'Field submitted ##################################################');
+                print('Field submitted #############################');
               } catch (e) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
@@ -210,11 +202,30 @@ class _CustomerNameAutoCompleteState extends State<CustomerNameAutoComplete> {
           child: ListView.builder(
             itemBuilder: (BuildContext context, int index) {
               final option = customers.elementAt(index);
-              return ListTile(
-                title: Text(option),
-                onTap: () {
-                  onSelected(option);
+              return Dismissible(
+                key: Key(option),
+                direction: DismissDirection.endToStart,
+                background: Container(
+                  color: ColorsManager.red,
+                  alignment: Alignment.centerRight,
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: const Icon(Icons.delete, color: Colors.white),
+                ),
+                onDismissed: (direction) {
+                  // Handle what happens when an item is dismissed
+                  setState(() {
+                    _customers.remove(option); // Remove the item from the list
+                  });
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('$option has been dismissed')),
+                  );
                 },
+                child: ListTile(
+                  title: Text(option),
+                  onTap: () {
+                    onSelected(option);
+                  },
+                ),
               );
             },
             itemCount: customers.length,
