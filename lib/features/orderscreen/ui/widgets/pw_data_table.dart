@@ -24,22 +24,22 @@ class PdfMyDataTable extends pw.StatelessWidget {
               'المنتج',
             ),
             _buildCell(
-              'الوزن',
+              'الوزن-كجم',
             ),
             _buildCell(
-              'وزن الفارغ',
+              'وزن الفارغ-كجم',
             ),
             _buildCell(
               'عدد الفارغ',
             ),
             _buildCell(
-              'صافي الوزن',
+              'صافي الوزن-كجم',
             ),
             _buildCell(
-              'السعر',
+              'السعر - جنيه',
             ),
             _buildCell(
-              'إجمالي',
+              'إجمالي - جنيه',
             ),
           ],
           // decoration: pw.BoxDecoration(color: PdfColor(10, 19, 20)),
@@ -49,14 +49,14 @@ class PdfMyDataTable extends pw.StatelessWidget {
             children: [
               _buildCell(product.action.toString()),
               _buildCell(product.name.toString()),
-              _buildCell('${product.weight} kg'),
-              _buildCell('${product.packageWeight} kg'),
+              _buildCell('${product.weight}'),
+              _buildCell('${product.packageWeight}'),
               _buildCell(product.numberPackage.toString()),
               _buildCell(
-                  '${(product.weight - (product.packageWeight * product.numberPackage))} kg'),
-              _buildCell('${product.price} L.E'),
+                  '${(product.weight - (product.packageWeight * product.numberPackage))}'),
+              _buildCell('${product.price}'),
               _buildCell(
-                  '${(product.weight - (product.packageWeight * product.numberPackage)) * product.price} L.E'),
+                  '${(product.weight - (product.packageWeight * product.numberPackage)) * product.price}'),
             ],
           ),
       ],

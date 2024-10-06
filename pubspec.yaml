@@ -106,10 +106,9 @@ flutter:
   # list giving the asset and other descriptors for the font. For
   # example:
   fonts:
-    - family: Cairo
+    - family: Amiri
       fonts:
-        - asset: assets/fonts/Cairo-Medium.ttf
-        - asset: assets/fonts/Cairo-Regular.ttf
+        - asset: assets/fonts/Amiri-Regular.ttf
           style: italic
     - family: Almarai
       fonts:

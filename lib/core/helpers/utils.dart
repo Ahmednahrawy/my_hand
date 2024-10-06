@@ -20,6 +20,7 @@ Future<Uint8List> generatePDF(
   final double paid,
   final double rest,
   final String? formattedDate,
+  final String? formattedTime,
 ) async {
   final doc = Document(
     title: 'فاتورة العميل',
@@ -29,7 +30,7 @@ Future<Uint8List> generatePDF(
       (await rootBundle.load('assets/images/khayray-logo-test-min.png'))
           .buffer
           .asUint8List());
-  final arabicFont = await rootBundle.load("assets/fonts/Almarai-Regular.ttf");
+  final arabicFont = await rootBundle.load("assets/fonts/Amiri-Regular.ttf");
   final ttf = pw.Font.ttf(arabicFont);
 
   // Retrieve the last serial number and increment it
@@ -42,60 +43,40 @@ Future<Uint8List> generatePDF(
   doc.addPage(
     MultiPage(
       pageTheme: pageTheme,
-      header: (final context) => pw.Image(
-          alignment: pw.Alignment.topLeft,
-          loadImage,
-          fit: pw.BoxFit.contain,
-          width: 100),
-      build: (final context) => [
-        pw.Container(
-          padding: const pw.EdgeInsets.only(left: 30, bottom: 20),
-          child: pw.Column(
-            crossAxisAlignment: pw.CrossAxisAlignment.center,
-            mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+      header: (final context) => pw.Center(
+        child: pw.Row(children: [
+          pw.Image(loadImage, fit: pw.BoxFit.contain, width: 100),
+          pw.SizedBox(width: 70),
+          pw.Column(crossAxisAlignment: pw.CrossAxisAlignment.end, children: [
+            pw.Text('إدارة : ', textDirection: pw.TextDirection.rtl),
+            pw.Text('ت : ', textDirection: pw.TextDirection.rtl),
+          ]),
+          pw.SizedBox(width: 30),
+          pw.Column(
+            crossAxisAlignment: pw.CrossAxisAlignment.start,
             children: [
-              pw.Padding(padding: const pw.EdgeInsets.only(top: 10)),
-              pw.Row(
-                crossAxisAlignment: pw.CrossAxisAlignment.start,
-                mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-                children: [
-                  pw.Column(
-                      crossAxisAlignment: pw.CrossAxisAlignment.end,
-                      children: [
-                        pw.Text('إدارة : ',
-                            textDirection: pw.TextDirection.rtl),
-                        pw.Text('ت : ', textDirection: pw.TextDirection.rtl),
-                      ]),
-                  pw.SizedBox(width: 40),
-                  pw.Column(
-                    crossAxisAlignment: pw.CrossAxisAlignment.start,
-                    children: [
-                      pw.Text(
-                        'مهدي إسماعيل قدورة',
-                        textDirection: pw.TextDirection.rtl,
-                      ),
-                      pw.Text('+20 1557435130'),
-                    ],
-                  ),
-                  pw.SizedBox(width: 70),
-                  pw.BarcodeWidget(
-                      data:
-                          'https://www.facebook.com/profile.php?id=100084492852878',
-                      width: 50,
-                      height: 50,
-                      barcode: pw.Barcode.qrCode(),
-                      drawText: false),
-                  pw.Padding(padding: pw.EdgeInsets.zero)
-                ],
+              pw.Text(
+                'مهدي إسماعيل قدورة',
+                textDirection: pw.TextDirection.rtl,
               ),
+              pw.Text('+20 1557435130'),
             ],
           ),
-        ),
+          pw.SizedBox(width: 70),
+          pw.BarcodeWidget(
+              data: 'https://www.facebook.com/profile.php?id=100084492852878',
+              width: 50,
+              height: 50,
+              barcode: pw.Barcode.qrCode(),
+              drawText: false),
+        ]),
+      ),
+      build: (final context) => [
         pw.Center(
           child: pw.Column(
             children: [
               pw.Text(
-                '  رقم الفاتورة: $invoiceSerial ',
+                '  فاتورة: $invoiceSerial ',
                 textDirection: pw.TextDirection.rtl,
                 textAlign: pw.TextAlign.center,
                 style: pw.TextStyle(
@@ -103,7 +84,7 @@ Future<Uint8List> generatePDF(
               ),
               pw.SizedBox(height: 5),
               pw.Text(
-                ' إسم العميل: $customerName ',
+                ' السيد: $customerName ',
                 textDirection: pw.TextDirection.rtl,
                 textAlign: pw.TextAlign.center,
                 style: pw.TextStyle(
@@ -111,7 +92,7 @@ Future<Uint8List> generatePDF(
               ),
               pw.SizedBox(height: 5),
               pw.Text(
-                '  التاريخ: $formattedDate ',
+                '  إصدار : $formattedDate- $formattedTime ',
                 textDirection: pw.TextDirection.rtl,
                 textAlign: pw.TextAlign.center,
                 style: pw.TextStyle(
@@ -120,6 +101,7 @@ Future<Uint8List> generatePDF(
             ],
           ),
         ),
+        pw.SizedBox(height: 40),
         pw.Align(
           alignment: pw.Alignment.centerLeft,
           child: pw.Container(
@@ -134,10 +116,12 @@ Future<Uint8List> generatePDF(
           children: [
             pw.Text('إجمالي الفاتورة : \n $totalCost L.E',
                 style: const pw.TextStyle(fontSize: 20)),
+            pw.SizedBox(width: 20),
             pw.Text(
               'تحصيل : \n $paid',
               style: const pw.TextStyle(fontSize: 20),
             ),
+            pw.SizedBox(width: 20),
             pw.Text(
               'الباقي : \n $rest',
               style: const pw.TextStyle(fontSize: 20),
@@ -145,15 +129,13 @@ Future<Uint8List> generatePDF(
           ],
         ),
       ],
-      // maxPages: 100,
-        
     ),
   );
   return doc.save();
 }
 
 Future<pw.PageTheme> _myPageTheme(PdfPageFormat format) async {
-  final arabicFont = await rootBundle.load("assets/fonts/Almarai-Regular.ttf");
+  final arabicFont = await rootBundle.load("assets/fonts/Amiri-Regular.ttf");
   final ttf = pw.Font.ttf(arabicFont);
 
   return pw.PageTheme(

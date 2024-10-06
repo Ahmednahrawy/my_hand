@@ -140,6 +140,7 @@ class _OrderscreenState extends State<Orderscreen> {
           _paid,
           _rest,
           formattedDate,
+            formattedTime
         );
         // Get a temporary directory path to save the PDF
         final tempDir = await getTemporaryDirectory();
