@@ -54,7 +54,7 @@ class _OrderscreenState extends State<Orderscreen> {
   void initState() {
     _packageWeightController.text = "2";
     _packageNumberController.text = "0";
-    _priceController.text = "0";
+    // _priceController.text = "0";
     _payController.text = "0";
     super.initState();
   }
@@ -438,7 +438,7 @@ class _OrderscreenState extends State<Orderscreen> {
                                 ),
                                 // price
                                 Flexible(
-                                  flex: 5,
+                                  flex: 4,
                                   child: AppTextFormField(
                                     controller: _priceController,
                                     labelText: 'السعر',
