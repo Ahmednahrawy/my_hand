@@ -99,9 +99,7 @@ Future<Uint8List> generatePDF(
         pw.SizedBox(height: 40),
         pw.Align(
           alignment: pw.Alignment.centerLeft,
-          child: pw.Container(
-            // height: 400,
-            alignment: pw.Alignment.center,
+          child: pw.Expanded(
             child: PdfMyDataTable(products: products, totalCost: totalCost),
           ),
         ),
