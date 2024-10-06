@@ -2,8 +2,6 @@ import 'package:flutter/services.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:pdf/widgets.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-
 import 'package:my_hand/features/data/models/product_model.dart';
 import 'package:my_hand/features/orderscreen/ui/widgets/pw_data_table.dart';
 
@@ -28,11 +26,10 @@ Future<Uint8List> generatePDF(
   final arabicFont = await rootBundle.load("assets/fonts/Amiri-Regular.ttf");
   final ttf = pw.Font.ttf(arabicFont);
 
-  // Retrieve the last serial number and increment it
-  final SharedPreferences prefs = await SharedPreferences.getInstance();
-  int invoiceSerial = (prefs.getInt('invoice_serial') ?? 0) + 1;
-  await prefs.setInt(
-      'invoice_serial', invoiceSerial); // Store the new serial number
+  final DateTime now = DateTime.now();
+  String invoiceSerial =
+      "${now.year}${now.month.toString().padLeft(2, '0')}${now.day.toString().padLeft(2, '0')}"
+      "${now.hour.toString().padLeft(2, '0')}${now.minute.toString().padLeft(2, '0')}${now.second.toString().padLeft(2, '0')}";
 
   final pageTheme = await _myPageTheme(format);
   doc.addPage(
@@ -85,14 +82,14 @@ Future<Uint8List> generatePDF(
                 style: pw.TextStyle(
                     fontSize: 30, fontWeight: pw.FontWeight.bold, font: ttf),
               ),
-              pw.SizedBox(height: 5),
-              pw.Text(
-                '  إصدار : $formattedDate- $formattedTime ',
-                textDirection: pw.TextDirection.rtl,
-                textAlign: pw.TextAlign.center,
-                style: pw.TextStyle(
-                    fontSize: 20, fontWeight: pw.FontWeight.normal, font: ttf),
-              ),
+              // pw.SizedBox(height: 5),
+              // pw.Text(
+              //   '  إصدار : $formattedDate- $formattedTime ',
+              //   textDirection: pw.TextDirection.rtl,
+              //   textAlign: pw.TextAlign.center,
+              //   style: pw.TextStyle(
+              //       fontSize: 20, fontWeight: pw.FontWeight.normal, font: ttf),
+              // ),
             ],
           ),
         ),
@@ -100,6 +97,7 @@ Future<Uint8List> generatePDF(
         pw.Align(
           alignment: pw.Alignment.centerLeft,
           child: pw.Expanded(
+            flex: 1,
             child: PdfMyDataTable(products: products, totalCost: totalCost),
           ),
         ),

@@ -189,8 +189,8 @@ class _CustomerNameAutoCompleteState extends State<CustomerNameAutoComplete> {
             ),
             obscureText: false,
             validator: (value) {
-              if (value == null || value.isEmpty || value.length < 5) {
-                return 'اكتب على الأقل 5 حروف';
+              if (value == null || value.isEmpty || value.length < 4) {
+                return 'اكتب على الأقل 4 حروف';
               }
               return null;
             },

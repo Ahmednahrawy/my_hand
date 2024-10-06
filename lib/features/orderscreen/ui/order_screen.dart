@@ -53,7 +53,7 @@ class _OrderscreenState extends State<Orderscreen> {
   @override
   void initState() {
     _packageWeightController.text = "2";
-    _packageNumberController.text = "0";
+    // _packageNumberController.text = "0";
     // _priceController.text = "0";
     _payController.text = "0";
     super.initState();
@@ -122,7 +122,7 @@ class _OrderscreenState extends State<Orderscreen> {
         );
       });
       _weightController.clear();
-      _packageNumberController.text = "0";
+      // _packageNumberController.text = "0";
     }
     _selectDate(context);
   }
