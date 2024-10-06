@@ -133,15 +133,14 @@ class _OrderscreenState extends State<Orderscreen> {
     if (_payKey.currentState!.validate()) {
       try {
         final pdfDoc = await generatePDF(
-          PdfPageFormat.a4,
-          products,
-          _customerName!,
-          _totalCost,
-          _paid,
-          _rest,
-          formattedDate,
-            formattedTime
-        );
+            PdfPageFormat.a4,
+            products,
+            _customerName!,
+            _totalCost,
+            _paid,
+            _rest,
+            formattedDate,
+            formattedTime);
         // Get a temporary directory path to save the PDF
         final tempDir = await getTemporaryDirectory();
         final filePath =
