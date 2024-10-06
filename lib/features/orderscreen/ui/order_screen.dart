@@ -34,7 +34,11 @@ class _OrderscreenState extends State<Orderscreen> {
   late DateTime selectedDate;
 
   final List<Product> products = [];
-  final List<String> actions = ['تخزين', 'بـيع', 'شراء'];
+  final List<String> actions = [
+    'شراء',
+    'بـيع',
+    'تخزين',
+  ];
   String? _action;
   String? buttonType;
   String? _customerName;
@@ -101,13 +105,14 @@ class _OrderscreenState extends State<Orderscreen> {
 
   void _addProduct() {
     if (_action == null) {
-      _showToast('Please select an action (تخزين, بـيع, شراء)');
+      _showToast('رجاء تحديد نوع الفاتورة (تخزين, بـيع, شراء)');
       return;
     }
     if (_selectedProduct == null) {
-      _showToast('Please select a product');
+      _showToast('رجاء اختر منتج ');
       return;
     }
+
     if (_formKey.currentState!.validate()) {
       setState(() {
         products.add(
@@ -122,7 +127,7 @@ class _OrderscreenState extends State<Orderscreen> {
         );
       });
       _weightController.clear();
-      // _packageNumberController.text = "0";
+      _packageNumberController.clear();
     }
     _selectDate(context);
   }
@@ -237,10 +242,22 @@ class _OrderscreenState extends State<Orderscreen> {
                           child: AppTextFormField(
                             controller: _payController,
                             labelText: 'تحصيل',
-                            suffixText: 'L.E',
+                            suffixText: 'جنيه',
+                            suffixIcon: IconButton(
+                              onPressed: () {
+                                _payController
+                                    .clear(); // Clear the input when the clear icon is pressed
+                                setState(() {
+                                  _payController.text = '';
+                                });
+                              },
+                              icon: _payController.text == ''
+                                  ? SizedBox.shrink()
+                                  : Icon(Icons.clear),
+                            ),
                             validator: (value) {
                               if (value == null || value.isEmpty) {
-                                return 'Please enter price.';
+                                return 'رجاء أدخل قيمة التحصيل';
                               }
                               return null;
                             },
@@ -273,146 +290,145 @@ class _OrderscreenState extends State<Orderscreen> {
       body: GestureDetector(
         onTap: () => FocusScope.of(context).unfocus(),
         child: Center(
-          child: Container(
-            width: screenSize.width * 0.95,
-            height: screenSize.height,
-            child: SingleChildScrollView(
-              scrollDirection: Axis.vertical,
-              padding: const EdgeInsets.all(5),
-              child: Column(
-                children: [
-                  Form(
-                    key: _formKey,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        // Customer name
-                        Card(
-                          child: CustomerNameAutoComplete(
-                            onCustomerSelected: _handleCustomerSelection,
+          child: Directionality(
+            textDirection: TextDirection.rtl,
+            child: Container(
+              width: screenSize.width * 0.95,
+              height: screenSize.height,
+              child: SingleChildScrollView(
+                scrollDirection: Axis.vertical,
+                padding: const EdgeInsets.all(5),
+                child: Column(
+                  children: [
+                    Form(
+                      key: _formKey,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          // Customer name
+                          Card(
+                            child: CustomerNameAutoComplete(
+                              onCustomerSelected: _handleCustomerSelection,
+                            ),
                           ),
-                        ),
-                        verticalSpace(5),
-                        // main activity buy,sell, store
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: actions.map((action) {
-                            return Flexible(
-                              flex: 1,
-                              child: AppTextButton(
-                                borderRadius: 9,
-                                onPressed: () {
-                                  _activeTextButton(action);
-                                },
-                                buttonWidth: screenSize.width * 0.28,
-                                buttonHeight: 12,
-                                verticalPadding: 2,
-                                buttonText: action,
-                                backgroundColor: _action == action
-                                    ? ColorsManager.lavander
-                                    : ColorsManager.mainBlue,
-                                textStyle: TextStyles.font16WhiteSemiBold,
-                              ),
-                            );
-                          }).toList(),
-                        ),
-                        verticalSpace(10),
-                        // Product selection
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: [
-                            Flexible(
-                              flex: 3,
-                              child: DropdownSearch<String>(
-                                key: _dropdownSearchKey,
-                                autoValidateMode:
-                                    AutovalidateMode.onUserInteraction,
-                                items: (filter, infiniteScrollProps) =>
-                                    _productList,
-                                selectedItem: _selectedProduct,
-                                decoratorProps: const DropDownDecoratorProps(
-                                  decoration: InputDecoration(
-                                    labelText: 'المنتج',
-                                    suffixIcon: Icon(Icons.search),
-                                    hintText: 'Search',
-                                  ),
+                          verticalSpace(5),
+                          // main activity buy,sell, store
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: actions.map((action) {
+                              return Flexible(
+                                flex: 1,
+                                child: AppTextButton(
+                                  borderRadius: 9,
+                                  onPressed: () {
+                                    _activeTextButton(action);
+                                  },
+                                  buttonWidth: screenSize.width * 0.28,
+                                  buttonHeight: 12,
+                                  verticalPadding: 2,
+                                  buttonText: action,
+                                  backgroundColor: _action == action
+                                      ? ColorsManager.lavander
+                                      : ColorsManager.mainBlue,
+                                  textStyle: TextStyles.font16WhiteSemiBold,
                                 ),
-                                popupProps: PopupProps.menu(
-                                  fit: FlexFit.tight,
-                                  itemBuilder:
-                                      (context, item, isDisabled, isSelected) {
-                                    return Container(
-                                      decoration: BoxDecoration(
-                                        border: Border(
-                                          bottom: BorderSide(
-                                            color: ColorsManager
-                                                .lightGray, // Border color
-                                            width: 1.0, // Border width
+                              );
+                            }).toList(),
+                          ),
+                          verticalSpace(10),
+                          // Product selection
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              Flexible(
+                                flex: 3,
+                                child: DropdownSearch<String>(
+                                  key: _dropdownSearchKey,
+                                  autoValidateMode:
+                                      AutovalidateMode.onUserInteraction,
+                                  items: (filter, infiniteScrollProps) =>
+                                      _productList,
+                                  selectedItem: _selectedProduct,
+                                  decoratorProps: const DropDownDecoratorProps(
+                                    decoration: InputDecoration(
+                                      labelText: 'المنتج',
+                                      suffixIcon: Icon(Icons.search),
+                                      hintText: 'Search',
+                                    ),
+                                  ),
+                                  popupProps: PopupProps.menu(
+                                    fit: FlexFit.tight,
+                                    itemBuilder: (context, item, isDisabled,
+                                        isSelected) {
+                                      return Container(
+                                        decoration: BoxDecoration(
+                                          border: Border(
+                                            bottom: BorderSide(
+                                              color: ColorsManager
+                                                  .lightGray, // Border color
+                                              width: 1.0, // Border width
+                                            ),
                                           ),
                                         ),
-                                      ),
-                                      child: ListTile(
-                                        title: Text(item),
-                                      ),
-                                    );
-                                  },
-                                  showSearchBox: true,
-                                ),
-                                onChanged: (value) {
-                                  setState(() {
-                                    // _productController.text = value;
-                                    _selectedProduct = value;
-                                  });
-                                },
-                              ),
-                            ),
-                            // Weight
-                            Flexible(
-                              flex: 4,
-                              child: AppTextFormField(
-                                controller: _weightController,
-                                labelText: 'الوزن أو العدد',
-                                suffixText: 'kg',
-                                suffixIcon: IconButton(
-                                  onPressed: () {
-                                    _weightController
-                                        .clear(); // Clear the input when the clear icon is pressed
+                                        child: ListTile(
+                                          title: Text(item),
+                                        ),
+                                      );
+                                    },
+                                    showSearchBox: true,
+                                  ),
+                                  onChanged: (value) {
                                     setState(() {
-                                      _weightController.text = '';
+                                      // _productController.text = value;
+                                      _selectedProduct = value;
                                     });
                                   },
-                                  icon: _weightController.text == ''
-                                      ? Icon(null)
-                                      : Icon(Icons.clear),
                                 ),
-                                validator: (value) {
-                                  if (value == null || value.isEmpty) {
-                                    return 'Please enter weight.';
-                                  }
-                                  return null;
-                                },
                               ),
-                            ),
-                          ],
-                        ),
-                        verticalSpace(10),
-                        // Package weight
-                        Card(
-                          color: ColorsManager.white,
-                          child: Padding(
-                            padding: EdgeInsets.symmetric(
-                                vertical: 10.w, horizontal: 5.w),
+                              // Weight
+                              Flexible(
+                                flex: 4,
+                                child: AppTextFormField(
+                                  controller: _weightController,
+                                  labelText: 'الوزن أو العدد',
+                                  hintText: 'كجم',
+                                  suffixIcon: _weightController.text == ''
+                                      ? null
+                                      : IconButton(
+                                          onPressed: () {
+                                            _weightController
+                                                .clear(); // Clear the input when the clear icon is pressed
+                                            setState(() {
+                                              _weightController.text = '';
+                                            });
+                                          },
+                                          icon: Icon(Icons.clear),
+                                        ),
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return 'رجاء أدخل الوزن';
+                                    }
+                                    return null;
+                                  },
+                                ),
+                              ),
+                            ],
+                          ),
+                          verticalSpace(10),
+                          // Package weight
+                          SizedBox(
+                            // color: ColorsManager.white,
                             child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               crossAxisAlignment: CrossAxisAlignment.end,
                               children: [
                                 // package weight
                                 Flexible(
-                                  flex: 2,
+                                  flex: 3,
                                   child: AppTextFormField(
                                     controller: _packageWeightController,
                                     labelText: 'وزن العبوة',
-                                    suffixText: 'kg',
+                                    suffixText: 'كجم',
                                     validator: (value) {
                                       if (value == null || value.isEmpty) {
                                         return 'أدخل وزن   \n العبوة الفارغة';
@@ -424,10 +440,24 @@ class _OrderscreenState extends State<Orderscreen> {
                                 horizontalSpace(1.w),
                                 // number of packages
                                 Flexible(
-                                  flex: 2,
+                                  flex: 3,
                                   child: AppTextFormField(
                                     controller: _packageNumberController,
-                                    labelText: 'عدد العبوات',
+                                    labelText: 'عددالفارغ',
+                                    suffixIcon: _packageNumberController.text ==
+                                            ''
+                                        ? null
+                                        : IconButton(
+                                            onPressed: () {
+                                              _packageNumberController
+                                                  .clear(); // Clear the input when the clear icon is pressed
+                                              setState(() {
+                                                _packageNumberController.text =
+                                                    '';
+                                              });
+                                            },
+                                            icon: Icon(Icons.clear),
+                                          ),
                                     validator: (value) {
                                       if (value == null || value.isEmpty) {
                                         return 'أدخل عدد العبوات أولا';
@@ -442,22 +472,22 @@ class _OrderscreenState extends State<Orderscreen> {
                                   child: AppTextFormField(
                                     controller: _priceController,
                                     labelText: 'السعر',
-                                    suffixText: 'L.E',
-                                    suffixIcon: IconButton(
-                                      onPressed: () {
-                                        _priceController
-                                            .clear(); // Clear the input when the clear icon is pressed
-                                        setState(() {
-                                          _priceController.text = '';
-                                        });
-                                      },
-                                      icon: _priceController.text == ''
-                                          ? Icon(null)
-                                          : Icon(Icons.clear),
-                                    ),
+                                    hintText: 'جنيه',
+                                    suffixIcon: _priceController.text == ''
+                                        ? null
+                                        : IconButton(
+                                            onPressed: () {
+                                              _priceController
+                                                  .clear(); // Clear the input when the clear icon is pressed
+                                              setState(() {
+                                                _priceController.text = '';
+                                              });
+                                            },
+                                            icon: Icon(Icons.clear),
+                                          ),
                                     validator: (value) {
                                       if (value == null || value.isEmpty) {
-                                        return 'Please enter price.';
+                                        return 'رجاء أدخل السعر';
                                       }
                                       return null;
                                     },
@@ -466,36 +496,36 @@ class _OrderscreenState extends State<Orderscreen> {
                               ],
                             ),
                           ),
-                        ),
-                        verticalSpace(10),
+                          verticalSpace(10),
+                        ],
+                      ),
+                    ),
+                    // Add product button
+                    AppTextButton(
+                      onPressed: _addProduct,
+                      buttonText: 'أضف منتج',
+                      textStyle: TextStyles.font16WhiteSemiBold,
+                      backgroundColor: ColorsManager.mainBlue,
+                      buttonWidth: screenSize.width * 0.6,
+                    ),
+                    verticalSpace(10),
+                    // Products table
+                    SizedBox(
+                      width: screenSize.width,
+                      child: MyDataTable(
+                        products: products,
+                        isInModal: false,
+                      ),
+                    ),
+                    // Total cost
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        Text('Total cost: $_totalCost L.E'),
                       ],
                     ),
-                  ),
-                  // Add product button
-                  AppTextButton(
-                    onPressed: _addProduct,
-                    buttonText: 'أضف منتج',
-                    textStyle: TextStyles.font16WhiteSemiBold,
-                    backgroundColor: ColorsManager.mainBlue,
-                    buttonWidth: screenSize.width * 0.6,
-                  ),
-                  verticalSpace(10),
-                  // Products table
-                  SizedBox(
-                    width: screenSize.width,
-                    child: MyDataTable(
-                      products: products,
-                      isInModal: false,
-                    ),
-                  ),
-                  // Total cost
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      Text('Total cost: $_totalCost L.E'),
-                    ],
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),

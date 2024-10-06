@@ -68,8 +68,10 @@ class PdfMyDataTable extends pw.StatelessWidget {
       padding: const pw.EdgeInsets.symmetric(horizontal: 0, vertical: 5),
       child: pw.Text(
         text,
+        textDirection: pw.TextDirection.rtl,
         textAlign: pw.TextAlign.center,
         style: const pw.TextStyle(fontSize: 17),
+        overflow: pw.TextOverflow.visible,
       ),
     );
   }

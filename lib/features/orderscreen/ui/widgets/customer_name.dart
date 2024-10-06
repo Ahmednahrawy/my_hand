@@ -109,92 +109,89 @@ class _CustomerNameAutoCompleteState extends State<CustomerNameAutoComplete> {
             });
           }
         });
-        return Directionality(
-          textDirection: TextDirection.rtl,
-          child: TextFormField(
-            controller: controller,
-            focusNode: focusNode,
-            keyboardType: TextInputType.name,
-            onFieldSubmitted: (String value) {
-              try {
-                if (value.isNotEmpty && !_customers.contains(value)) {
-                  _addSuggestion(value);
-                }
-                setState(() {
-                  _selectedCustomerName = value;
-                  widget.onCustomerSelected(_selectedCustomerName);
-                });
-                print('Field submitted #############################');
-              } catch (e) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text('Error submitting suggestions: $e'),
-                  ),
-                );
+        return TextFormField(
+          controller: controller,
+          focusNode: focusNode,
+          keyboardType: TextInputType.name,
+          onFieldSubmitted: (String value) {
+            try {
+              if (value.isNotEmpty && !_customers.contains(value)) {
+                _addSuggestion(value);
               }
-            },
-            onChanged: (String value) {
               setState(() {
-                // Update the selected customer name whenever the text changes
                 _selectedCustomerName = value;
+                widget.onCustomerSelected(_selectedCustomerName);
               });
-            },
-            decoration: InputDecoration(
-              isDense: true,
-              contentPadding: EdgeInsets.symmetric(
-                horizontal: 20,
-                vertical: 15,
-              ),
-              focusedBorder: OutlineInputBorder(
-                  borderSide: const BorderSide(
-                    color: ColorsManager.mainBlue,
-                    width: 1.3,
-                  ),
-                  borderRadius: BorderRadius.circular(15)),
-              enabledBorder: OutlineInputBorder(
-                borderSide: const BorderSide(
-                    color: ColorsManager.lightBlue, width: 1.3),
-                borderRadius: BorderRadius.circular(15),
-              ),
-              errorBorder: OutlineInputBorder(
-                borderSide: const BorderSide(
-                  color: Colors.red,
-                  width: 1.3,
+              print('Field submitted #############################');
+            } catch (e) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('Error submitting suggestions: $e'),
                 ),
-                borderRadius: BorderRadius.circular(15.0),
-              ),
-              focusedErrorBorder: OutlineInputBorder(
-                borderSide: const BorderSide(
-                  color: Color.fromARGB(255, 166, 19, 5),
-                  width: 1.3,
-                ),
-                borderRadius: BorderRadius.circular(15.0),
-              ),
-              labelText: 'إسم العميل',
-              suffixIcon: IconButton(
-                onPressed: () {
-                  controller
-                      .clear(); // Clear the input when the clear icon is pressed
-                  setState(() {
-                    _selectedCustomerName = '';
-                    widget.onCustomerSelected(
-                        null); // Reset the customer selection
-                  });
-                },
-                icon: _selectedCustomerName == ''
-                    ? Icon(null)
-                    : Icon(Icons.clear),
-              ),
-              fillColor: ColorsManager.moreLightGray,
+              );
+            }
+          },
+          onChanged: (String value) {
+            setState(() {
+              // Update the selected customer name whenever the text changes
+              _selectedCustomerName = value;
+            });
+          },
+          decoration: InputDecoration(
+            isDense: true,
+            contentPadding: EdgeInsets.symmetric(
+              horizontal: 20,
+              vertical: 15,
             ),
-            obscureText: false,
-            validator: (value) {
-              if (value == null || value.isEmpty || value.length < 4) {
-                return 'اكتب على الأقل 4 حروف';
-              }
-              return null;
-            },
+            focusedBorder: OutlineInputBorder(
+                borderSide: const BorderSide(
+                  color: ColorsManager.mainBlue,
+                  width: 1.3,
+                ),
+                borderRadius: BorderRadius.circular(15)),
+            enabledBorder: OutlineInputBorder(
+              borderSide:
+                  const BorderSide(color: ColorsManager.lightBlue, width: 1.3),
+              borderRadius: BorderRadius.circular(15),
+            ),
+            errorBorder: OutlineInputBorder(
+              borderSide: const BorderSide(
+                color: Colors.red,
+                width: 1.3,
+              ),
+              borderRadius: BorderRadius.circular(15.0),
+            ),
+            focusedErrorBorder: OutlineInputBorder(
+              borderSide: const BorderSide(
+                color: Color.fromARGB(255, 166, 19, 5),
+                width: 1.3,
+              ),
+              borderRadius: BorderRadius.circular(15.0),
+            ),
+            labelText: 'إسم العميل',
+            suffixIcon: IconButton(
+              onPressed: () {
+                controller
+                    .clear(); // Clear the input when the clear icon is pressed
+                setState(() {
+                  _selectedCustomerName = '';
+                  widget
+                      .onCustomerSelected(null); // Reset the customer selection
+                });
+              },
+              icon: _selectedCustomerName == ''
+                  ? SizedBox.shrink()
+                  : Icon(Icons.clear),
+            ),
+            fillColor: ColorsManager.moreLightGray,
           ),
+          obscureText: false,
+          validator: (value) {
+            if (value == null || value.isEmpty || value.length < 4) {
+              return 'اكتب على الأقل 4 حروف';
+            }
+            return null;
+          },
         );
       },
       optionsViewBuilder: (context, Function(String) onSelected, customers) {

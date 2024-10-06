@@ -64,60 +64,69 @@ Future<Uint8List> generatePDF(
         ]),
       ),
       build: (final context) => [
-        pw.Center(
+        pw.Directionality(
+          textDirection: pw.TextDirection.rtl,
           child: pw.Column(
             children: [
-              pw.Text(
-                '  فاتورة: $invoiceSerial ',
-                textDirection: pw.TextDirection.rtl,
-                textAlign: pw.TextAlign.center,
-                style: pw.TextStyle(
-                    fontSize: 20, fontWeight: pw.FontWeight.normal, font: ttf),
+              pw.Center(
+                child: pw.Column(
+                  children: [
+                    pw.Text(
+                      '  فاتورة: $invoiceSerial ',
+                      textDirection: pw.TextDirection.rtl,
+                      textAlign: pw.TextAlign.center,
+                      style: pw.TextStyle(
+                          fontSize: 20,
+                          fontWeight: pw.FontWeight.normal,
+                          font: ttf),
+                    ),
+                    pw.SizedBox(height: 5),
+                    pw.Text(
+                      ' السيد: $customerName ',
+                      textDirection: pw.TextDirection.rtl,
+                      textAlign: pw.TextAlign.center,
+                      style: pw.TextStyle(
+                          fontSize: 30,
+                          fontWeight: pw.FontWeight.bold,
+                          font: ttf),
+                    ),
+                    pw.SizedBox(height: 5),
+                    pw.Text(
+                      '  إصدار : $formattedDate- $formattedTime ',
+                      textDirection: pw.TextDirection.rtl,
+                      textAlign: pw.TextAlign.center,
+                      style: pw.TextStyle(
+                          fontSize: 20,
+                          fontWeight: pw.FontWeight.normal,
+                          font: ttf),
+                    ),
+                  ],
+                ),
               ),
-              pw.SizedBox(height: 5),
-              pw.Text(
-                ' السيد: $customerName ',
-                textDirection: pw.TextDirection.rtl,
-                textAlign: pw.TextAlign.center,
-                style: pw.TextStyle(
-                    fontSize: 30, fontWeight: pw.FontWeight.bold, font: ttf),
+              pw.SizedBox(height: 40),
+              pw.Center(
+                child: PdfMyDataTable(products: products, totalCost: totalCost),
               ),
-              // pw.SizedBox(height: 5),
-              // pw.Text(
-              //   '  إصدار : $formattedDate- $formattedTime ',
-              //   textDirection: pw.TextDirection.rtl,
-              //   textAlign: pw.TextAlign.center,
-              //   style: pw.TextStyle(
-              //       fontSize: 20, fontWeight: pw.FontWeight.normal, font: ttf),
-              // ),
+              pw.SizedBox(height: 10),
+              pw.Row(
+                mainAxisAlignment: pw.MainAxisAlignment.start,
+                children: [
+                  pw.Text('إجمالي الفاتورة : \n $totalCost L.E',
+                      style: const pw.TextStyle(fontSize: 20)),
+                  pw.SizedBox(width: 20),
+                  pw.Text(
+                    'تحصيل : \n $paid',
+                    style: const pw.TextStyle(fontSize: 20),
+                  ),
+                  pw.SizedBox(width: 20),
+                  pw.Text(
+                    'الباقي : \n $rest',
+                    style: const pw.TextStyle(fontSize: 20),
+                  )
+                ],
+              ),
             ],
           ),
-        ),
-        pw.SizedBox(height: 40),
-        pw.Align(
-          alignment: pw.Alignment.centerLeft,
-          child: pw.Expanded(
-            flex: 1,
-            child: PdfMyDataTable(products: products, totalCost: totalCost),
-          ),
-        ),
-        pw.SizedBox(height: 10),
-        pw.Row(
-          mainAxisAlignment: pw.MainAxisAlignment.start,
-          children: [
-            pw.Text('إجمالي الفاتورة : \n $totalCost L.E',
-                style: const pw.TextStyle(fontSize: 20)),
-            pw.SizedBox(width: 20),
-            pw.Text(
-              'تحصيل : \n $paid',
-              style: const pw.TextStyle(fontSize: 20),
-            ),
-            pw.SizedBox(width: 20),
-            pw.Text(
-              'الباقي : \n $rest',
-              style: const pw.TextStyle(fontSize: 20),
-            )
-          ],
         ),
       ],
     ),
