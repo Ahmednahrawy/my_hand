@@ -47,14 +47,14 @@ class _MyDataTableState extends State<MyDataTable> {
               ),
             _buildDataCell(product.action.toString()),
             _buildDataCell(product.name.toString()),
-            _buildDataCell('${product.weight}  kg'),
+            _buildDataCell('${product.weight.toStringAsFixed(2)}  kg'),
             if (widget.isInModal) _buildDataCell('${product.numberPackage}'),
             if (widget.isInModal)
               _buildDataCell(
-                  '${(product.weight - (product.packageWeight * product.numberPackage))}  kg'),
-            _buildDataCell('${product.price} L.E'),
+                  '${(product.weight - (product.packageWeight * product.numberPackage)).toStringAsFixed(2)}  kg'),
+            _buildDataCell('${product.price.toStringAsFixed(2)} L.E'),
             _buildDataCell(
-                '${(product.weight - (product.packageWeight * product.numberPackage)) * product.price} L.E'),
+                '${((product.weight - (product.packageWeight * product.numberPackage)) * product.price).toStringAsFixed(2)} L.E'),
           ],
           onSelectChanged: (selected) {
             // Handle row selection if needed

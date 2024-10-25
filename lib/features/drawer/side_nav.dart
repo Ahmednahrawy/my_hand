@@ -34,33 +34,35 @@ class _SideNavState extends State<SideNav> {
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               // logo
-              Padding(
-                padding: const EdgeInsets.all(10.0),
-                child: Container(
-                  height: isCollapse ? 80.0 : 100.0,
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                      boxShadow: [
-                        BoxShadow(
-                          blurRadius: 5.0,
-                          color: ColorsManager.black,
-                          offset: Offset(1.0, 1.0),
-                        )
-                      ],
-                      borderRadius:
-                          isCollapse ? null : BorderRadius.circular(10),
-                      color: Colors.white),
-                  child: Center(
-                    child: ListTile(
-                      leading: CircleAvatar(
-                          maxRadius: isCollapse ? 20.0 : 55.0,
-                          backgroundImage:
-                              AssetImage('assets/images/khayrat_logoo.png'),
-                          child: Text('a')),
+              isCollapse
+                  ? Text('Siwa')
+                  : Padding(
+                      padding: const EdgeInsets.all(10.0),
+                      child: Container(
+                        height: 100.0,
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                            boxShadow: [
+                              BoxShadow(
+                                blurRadius: 5.0,
+                                color: ColorsManager.black,
+                                offset: Offset(1.0, 1.0),
+                              )
+                            ],
+                            borderRadius: BorderRadius.circular(10),
+                            color: Colors.white),
+                        child: Center(
+                          child: ListTile(
+                            leading: CircleAvatar(
+                                maxRadius: 55.0,
+                                backgroundImage: AssetImage(
+                                    'assets/images/khayray-logo-test-min.png'),
+                                child: Text('Siwa')),
+                          ),
+                        ),
+                      ),
                     ),
-                  ),
-                ),
-              ),
+              //items
               verticalSpace(10),
               ListView.builder(
                 shrinkWrap: true,

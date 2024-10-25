@@ -50,11 +50,11 @@ class PdfMyDataTable extends pw.StatelessWidget {
               _buildCell(product.action.toString()),
               _buildCell(product.name.toString()),
               _buildCell('${product.weight}'),
-              _buildCell('${product.packageWeight}'),
+              _buildCell('${product.packageWeight.toStringAsFixed(2)}'),
               _buildCell(product.numberPackage.toString()),
               _buildCell(
                   '${(product.weight - (product.packageWeight * product.numberPackage))}'),
-              _buildCell('${product.price}'),
+              _buildCell('${product.price.toStringAsFixed(2)}'),
               _buildCell(
                   '${(product.weight - (product.packageWeight * product.numberPackage)) * product.price}'),
             ],

@@ -40,8 +40,12 @@ Future<Uint8List> generatePDF(
           pw.Image(loadImage, fit: pw.BoxFit.contain, width: 100),
           pw.SizedBox(width: 70),
           pw.Column(crossAxisAlignment: pw.CrossAxisAlignment.end, children: [
-            pw.Text('إدارة : ', textDirection: pw.TextDirection.rtl),
-            pw.Text('ت : ', textDirection: pw.TextDirection.rtl),
+            pw.Text(
+              'إدارة : ',
+            ),
+            pw.Text(
+              'ت : ',
+            ),
           ]),
           pw.SizedBox(width: 30),
           pw.Column(
@@ -49,7 +53,6 @@ Future<Uint8List> generatePDF(
             children: [
               pw.Text(
                 'مهدي إسماعيل قدورة',
-                textDirection: pw.TextDirection.rtl,
               ),
               pw.Text('+20 1557435130'),
             ],
@@ -64,69 +67,63 @@ Future<Uint8List> generatePDF(
         ]),
       ),
       build: (final context) => [
-        pw.Directionality(
-          textDirection: pw.TextDirection.rtl,
-          child: pw.Column(
-            children: [
-              pw.Center(
-                child: pw.Column(
-                  children: [
-                    pw.Text(
-                      '  فاتورة: $invoiceSerial ',
-                      textDirection: pw.TextDirection.rtl,
-                      textAlign: pw.TextAlign.center,
-                      style: pw.TextStyle(
-                          fontSize: 20,
-                          fontWeight: pw.FontWeight.normal,
-                          font: ttf),
-                    ),
-                    pw.SizedBox(height: 5),
-                    pw.Text(
-                      ' السيد: $customerName ',
-                      textDirection: pw.TextDirection.rtl,
-                      textAlign: pw.TextAlign.center,
-                      style: pw.TextStyle(
-                          fontSize: 30,
-                          fontWeight: pw.FontWeight.bold,
-                          font: ttf),
-                    ),
-                    pw.SizedBox(height: 5),
-                    pw.Text(
-                      '  إصدار : $formattedDate- $formattedTime ',
-                      textDirection: pw.TextDirection.rtl,
-                      textAlign: pw.TextAlign.center,
-                      style: pw.TextStyle(
-                          fontSize: 20,
-                          fontWeight: pw.FontWeight.normal,
-                          font: ttf),
-                    ),
-                  ],
-                ),
-              ),
-              pw.SizedBox(height: 40),
-              pw.Center(
-                child: PdfMyDataTable(products: products, totalCost: totalCost),
-              ),
-              pw.SizedBox(height: 10),
-              pw.Row(
-                mainAxisAlignment: pw.MainAxisAlignment.start,
+        pw.Column(
+          children: [
+            pw.Center(
+              child: pw.Column(
                 children: [
-                  pw.Text('إجمالي الفاتورة : \n $totalCost L.E',
-                      style: const pw.TextStyle(fontSize: 20)),
-                  pw.SizedBox(width: 20),
                   pw.Text(
-                    'تحصيل : \n $paid',
-                    style: const pw.TextStyle(fontSize: 20),
+                    '  فاتورة: $invoiceSerial ',
+                    textAlign: pw.TextAlign.center,
+                    style: pw.TextStyle(
+                        fontSize: 20,
+                        fontWeight: pw.FontWeight.normal,
+                        font: ttf),
                   ),
-                  pw.SizedBox(width: 20),
+                  pw.SizedBox(height: 5),
                   pw.Text(
-                    'الباقي : \n $rest',
-                    style: const pw.TextStyle(fontSize: 20),
-                  )
+                    ' السيد: $customerName ',
+                    textAlign: pw.TextAlign.center,
+                    style: pw.TextStyle(
+                        fontSize: 30,
+                        fontWeight: pw.FontWeight.bold,
+                        font: ttf),
+                  ),
+                  pw.SizedBox(height: 5),
+                  pw.Text(
+                    '  إصدار : $formattedDate- $formattedTime ',
+                    textAlign: pw.TextAlign.center,
+                    style: pw.TextStyle(
+                        fontSize: 20,
+                        fontWeight: pw.FontWeight.normal,
+                        font: ttf),
+                  ),
                 ],
               ),
-            ],
-          ),
+            ),
+            pw.SizedBox(height: 40),
+            pw.Center(
+              child: PdfMyDataTable(products: products, totalCost: totalCost),
+            ),
+            pw.SizedBox(height: 10),
+            pw.Row(
+              mainAxisAlignment: pw.MainAxisAlignment.start,
+              children: [
+                pw.Text('إجمالي الفاتورة : \n $totalCost L.E',
+                    style: const pw.TextStyle(fontSize: 20)),
+                pw.SizedBox(width: 20),
+                pw.Text(
+                  'تحصيل : \n $paid',
+                  style: const pw.TextStyle(fontSize: 20),
+                ),
+                pw.SizedBox(width: 20),
+                pw.Text(
+                  'الباقي : \n $rest',
+                  style: const pw.TextStyle(fontSize: 20),
+                )
+              ],
+            ),
+          ],
         ),
       ],
     ),

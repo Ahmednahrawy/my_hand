@@ -184,114 +184,119 @@ class _OrderscreenState extends State<Orderscreen> {
   Widget build(BuildContext context) {
     // media query size
     final screenSize = MediaQuery.of(context).size;
-    return Scaffold(
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      appBar: AppBar(
-        title: Text(
-          "إصدار فاتورة",
-          style: TextStyles.font20MainBlueBold,
+    return Directionality(
+      textDirection: TextDirection.rtl,
+      child: Scaffold(
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+        appBar: AppBar(
+          title: Text(
+            "إصدار فاتورة",
+            style: TextStyles.font20MainBlueBold,
+          ),
         ),
-      ),
-      drawer: const SideNav(),
-      extendBody: true,
-      // Send data button
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          showModalBottomSheet(
-            backgroundColor: ColorsManager.moreLighterGray,
-            context: context,
-            builder: (BuildContext context) {
-              return GestureDetector(
-                onTap: () => FocusScope.of(context).unfocus(),
-                child: SizedBox(
-                  width: screenSize.width,
-                  height: 500,
-                  child: SingleChildScrollView(
-                    scrollDirection: Axis.vertical,
-                    child: Column(
-                      children: [
-                        verticalSpace(5),
-                        SingleChildScrollView(
-                          scrollDirection: Axis.horizontal,
-                          child: MyDataTable(
-                            products: products,
-                            isInModal: true,
-                          ),
-                        ),
-                        Column(
-                          mainAxisAlignment: MainAxisAlignment.end,
+        drawer: const SideNav(),
+        extendBody: true,
+        // Send data button
+        floatingActionButton: FloatingActionButton(
+          onPressed: () {
+            showModalBottomSheet(
+              backgroundColor: ColorsManager.moreLighterGray,
+              context: context,
+              builder: (BuildContext context) {
+                return GestureDetector(
+                  onTap: () => FocusScope.of(context).unfocus(),
+                  child: Directionality(
+                    textDirection: TextDirection.rtl,
+                    child: SizedBox(
+                      width: screenSize.width,
+                      height: 500,
+                      child: SingleChildScrollView(
+                        scrollDirection: Axis.vertical,
+                        child: Column(
                           children: [
-                            Text(
-                              'إجالي المبلغ: $_totalCost  L.E',
-                              textDirection: TextDirection.rtl,
+                            verticalSpace(5),
+                            SingleChildScrollView(
+                              scrollDirection: Axis.horizontal,
+                              reverse: false,
+                              child: MyDataTable(
+                                products: products,
+                                isInModal: true,
+                              ),
                             ),
-                            Text(
-                              'التحصيل : $_paid L.E ',
-                              textDirection: TextDirection.rtl,
+                            Column(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                Text(
+                                  'إجالي المبلغ: ${_totalCost.toStringAsFixed(2)}  L.E',
+                                  textDirection: TextDirection.rtl,
+                                ),
+                                Text(
+                                  'التحصيل : $_paid L.E ',
+                                  textDirection: TextDirection.rtl,
+                                ),
+                                Text(
+                                  'الباقي: ${_rest.toStringAsFixed(2)} L.E',
+                                  textDirection: TextDirection.rtl,
+                                ),
+                              ],
                             ),
-                            Text(
-                              'الباقي: $_rest L.E',
-                              textDirection: TextDirection.rtl,
+                            verticalSpace(5),
+                            // paying
+                            Form(
+                              key: _payKey,
+                              child: AppTextFormField(
+                                controller: _payController,
+                                labelText: 'تحصيل',
+                                suffixText: 'جنيه',
+                                suffixIcon: IconButton(
+                                  onPressed: () {
+                                    _payController
+                                        .clear(); // Clear the input when the clear icon is pressed
+                                    setState(() {
+                                      _payController.text = '';
+                                    });
+                                  },
+                                  icon: _payController.text == ''
+                                      ? SizedBox.shrink()
+                                      : Icon(Icons.clear),
+                                ),
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return 'رجاء أدخل قيمة التحصيل';
+                                  }
+                                  return null;
+                                },
+                              ),
                             ),
+
+                            verticalSpace(10),
+                            AppTextButton(
+                              onPressed: _sendInvoice,
+                              buttonText: 'إرسال',
+                              textStyle: TextStyles.font18WhiteMedium,
+                              buttonWidth: screenSize.width * 0.5,
+                              backgroundColor: ColorsManager.gray,
+                            ),
+                            verticalSpace(10),
                           ],
                         ),
-                        verticalSpace(5),
-                        // paying
-                        Form(
-                          key: _payKey,
-                          child: AppTextFormField(
-                            controller: _payController,
-                            labelText: 'تحصيل',
-                            suffixText: 'جنيه',
-                            suffixIcon: IconButton(
-                              onPressed: () {
-                                _payController
-                                    .clear(); // Clear the input when the clear icon is pressed
-                                setState(() {
-                                  _payController.text = '';
-                                });
-                              },
-                              icon: _payController.text == ''
-                                  ? SizedBox.shrink()
-                                  : Icon(Icons.clear),
-                            ),
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'رجاء أدخل قيمة التحصيل';
-                              }
-                              return null;
-                            },
-                          ),
-                        ),
-
-                        verticalSpace(10),
-                        AppTextButton(
-                          onPressed: _sendInvoice,
-                          buttonText: 'إرسال',
-                          textStyle: TextStyles.font18WhiteMedium,
-                          buttonWidth: screenSize.width * 0.5,
-                          backgroundColor: ColorsManager.gray,
-                        ),
-                        verticalSpace(10),
-                      ],
+                      ),
                     ),
                   ),
-                ),
-              );
-            },
-          );
-        },
-        child: const Icon(
-          Icons.share_sharp,
-          size: 28,
+                );
+              },
+            );
+          },
+          child: const Icon(
+            Icons.share_sharp,
+            size: 28,
+          ),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(50)),
         ),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(50)),
-      ),
-      body: GestureDetector(
-        onTap: () => FocusScope.of(context).unfocus(),
-        child: Center(
-          child: Directionality(
-            textDirection: TextDirection.rtl,
+        body: GestureDetector(
+          onTap: () => FocusScope.of(context).unfocus(),
+          child: Center(
             child: Container(
               width: screenSize.width * 0.95,
               height: screenSize.height,
