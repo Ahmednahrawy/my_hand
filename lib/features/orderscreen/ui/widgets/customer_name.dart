@@ -139,7 +139,7 @@ class _CustomerNameAutoCompleteState extends State<CustomerNameAutoComplete> {
           },
           decoration: InputDecoration(
             isDense: true,
-            contentPadding: EdgeInsets.symmetric(
+            contentPadding: const EdgeInsets.symmetric(
               horizontal: 20,
               vertical: 15,
             ),
@@ -180,8 +180,8 @@ class _CustomerNameAutoCompleteState extends State<CustomerNameAutoComplete> {
                 });
               },
               icon: _selectedCustomerName == ''
-                  ? SizedBox.shrink()
-                  : Icon(Icons.clear),
+                  ? const SizedBox.shrink()
+                  : const Icon(Icons.clear),
             ),
             fillColor: ColorsManager.moreLightGray,
           ),

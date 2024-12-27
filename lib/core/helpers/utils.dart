@@ -1,7 +1,7 @@
 import 'package:flutter/services.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
-import 'package:pdf/widgets.dart';
+
 import 'package:my_hand/features/data/models/product_model.dart';
 import 'package:my_hand/features/orderscreen/ui/widgets/pw_data_table.dart';
 
@@ -15,7 +15,7 @@ Future<Uint8List> generatePDF(
   final String? formattedDate,
   final String? formattedTime,
 ) async {
-  final doc = Document(
+  final doc = pw.Document(
     title: 'فاتورة العميل',
     compress: true,
   );
@@ -26,14 +26,20 @@ Future<Uint8List> generatePDF(
   final arabicFont = await rootBundle.load("assets/fonts/Amiri-Regular.ttf");
   final ttf = pw.Font.ttf(arabicFont);
 
-  final DateTime now = DateTime.now();
+  final DateTime now = await DateTime.now();
   String invoiceSerial =
       "${now.year}${now.month.toString().padLeft(2, '0')}${now.day.toString().padLeft(2, '0')}"
       "${now.hour.toString().padLeft(2, '0')}${now.minute.toString().padLeft(2, '0')}${now.second.toString().padLeft(2, '0')}";
 
   final pageTheme = await _myPageTheme(format);
+
+  String invoiceName = products[0].action == "شراء"
+      ? "فاتورة مشتريات"
+      : products[0].action == "بـيع"
+          ? "فاتورة بيع"
+          : "فاتورة تخزين";
   doc.addPage(
-    MultiPage(
+    pw.MultiPage(
       pageTheme: pageTheme,
       header: (final context) => pw.Center(
         child: pw.Row(children: [
@@ -67,62 +73,52 @@ Future<Uint8List> generatePDF(
         ]),
       ),
       build: (final context) => [
-        pw.Column(
-          children: [
-            pw.Center(
-              child: pw.Column(
-                children: [
-                  pw.Text(
-                    '  فاتورة: $invoiceSerial ',
-                    textAlign: pw.TextAlign.center,
-                    style: pw.TextStyle(
-                        fontSize: 20,
-                        fontWeight: pw.FontWeight.normal,
-                        font: ttf),
-                  ),
-                  pw.SizedBox(height: 5),
-                  pw.Text(
-                    ' السيد: $customerName ',
-                    textAlign: pw.TextAlign.center,
-                    style: pw.TextStyle(
-                        fontSize: 30,
-                        fontWeight: pw.FontWeight.bold,
-                        font: ttf),
-                  ),
-                  pw.SizedBox(height: 5),
-                  pw.Text(
-                    '  إصدار : $formattedDate- $formattedTime ',
-                    textAlign: pw.TextAlign.center,
-                    style: pw.TextStyle(
-                        fontSize: 20,
-                        fontWeight: pw.FontWeight.normal,
-                        font: ttf),
-                  ),
-                ],
+        pw.Center(
+          child: pw.Column(
+            children: [
+              pw.Text(
+                '  فاتورة: $invoiceSerial \n $invoiceName ',
+                textAlign: pw.TextAlign.center,
+                style: pw.TextStyle(
+                    fontSize: 20, fontWeight: pw.FontWeight.normal, font: ttf),
               ),
+              pw.Text(
+                ' السيد: $customerName ',
+                textAlign: pw.TextAlign.center,
+                style: pw.TextStyle(
+                    fontSize: 30, fontWeight: pw.FontWeight.bold, font: ttf),
+              ),
+              pw.Text(
+                '  إصدار : $formattedDate- $formattedTime ',
+                textAlign: pw.TextAlign.center,
+                style: pw.TextStyle(
+                    fontSize: 20, fontWeight: pw.FontWeight.normal, font: ttf),
+              ),
+            ],
+          ),
+        ),
+        // table
+        pw.Align(
+          alignment: pw.Alignment.centerLeft,
+          child: pw.Container(
+            alignment: pw.Alignment.center,
+            child: PdfMyDataTable(products: products, totalCost: totalCost),
+          ),
+        ),
+        pw.SizedBox(height: 10),
+        pw.Row(
+          mainAxisAlignment: pw.MainAxisAlignment.start,
+          children: [
+            pw.Text('إجمالي الفاتورة : \n $totalCost L.E',
+                style: const pw.TextStyle(fontSize: 20)),
+            pw.Text(
+              'تحصيل : \n $paid',
+              style: const pw.TextStyle(fontSize: 20),
             ),
-            pw.SizedBox(height: 40),
-            pw.Center(
-              child: PdfMyDataTable(products: products, totalCost: totalCost),
-            ),
-            pw.SizedBox(height: 10),
-            pw.Row(
-              mainAxisAlignment: pw.MainAxisAlignment.start,
-              children: [
-                pw.Text('إجمالي الفاتورة : \n $totalCost L.E',
-                    style: const pw.TextStyle(fontSize: 20)),
-                pw.SizedBox(width: 20),
-                pw.Text(
-                  'تحصيل : \n $paid',
-                  style: const pw.TextStyle(fontSize: 20),
-                ),
-                pw.SizedBox(width: 20),
-                pw.Text(
-                  'الباقي : \n $rest',
-                  style: const pw.TextStyle(fontSize: 20),
-                )
-              ],
-            ),
+            pw.Text(
+              'الباقي : \n $rest',
+              style: const pw.TextStyle(fontSize: 20),
+            )
           ],
         ),
       ],
@@ -130,6 +126,7 @@ Future<Uint8List> generatePDF(
   );
   return doc.save();
 }
+
 
 Future<pw.PageTheme> _myPageTheme(PdfPageFormat format) async {
   final arabicFont = await rootBundle.load("assets/fonts/Amiri-Regular.ttf");

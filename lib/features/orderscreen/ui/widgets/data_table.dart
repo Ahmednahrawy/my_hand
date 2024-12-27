@@ -24,7 +24,7 @@ class _MyDataTableState extends State<MyDataTable> {
     return DataTable(
       columns: [
         if (widget.isInModal) _buildDataColumn('حذف'),
-        _buildDataColumn('العملية'),
+        // _buildDataColumn('العملية'),
         _buildDataColumn('المنتج'),
         _buildDataColumn('الوزن'),
         if (widget.isInModal) _buildDataColumn("عدد العبوات"),
@@ -45,7 +45,7 @@ class _MyDataTableState extends State<MyDataTable> {
                   ),
                 ),
               ),
-            _buildDataCell(product.action.toString()),
+            // _buildDataCell(product.action.toString()),
             _buildDataCell(product.name.toString()),
             _buildDataCell('${product.weight.toStringAsFixed(2)}  kg'),
             if (widget.isInModal) _buildDataCell('${product.numberPackage}'),

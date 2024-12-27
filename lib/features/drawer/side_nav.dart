@@ -35,14 +35,14 @@ class _SideNavState extends State<SideNav> {
             children: [
               // logo
               isCollapse
-                  ? Text('Siwa')
+                  ? const Text('Siwa')
                   : Padding(
                       padding: const EdgeInsets.all(10.0),
                       child: Container(
                         height: 100.0,
                         width: double.infinity,
                         decoration: BoxDecoration(
-                            boxShadow: [
+                            boxShadow: const [
                               BoxShadow(
                                 blurRadius: 5.0,
                                 color: ColorsManager.black,
@@ -51,7 +51,7 @@ class _SideNavState extends State<SideNav> {
                             ],
                             borderRadius: BorderRadius.circular(10),
                             color: Colors.white),
-                        child: Center(
+                        child: const Center(
                           child: ListTile(
                             leading: CircleAvatar(
                                 maxRadius: 55.0,
@@ -130,7 +130,7 @@ void _navigateToRoute(BuildContext context, int index) {
       routeName = Routes.customerScreen;
       break;
     case 2:
-      routeName = Routes.customerScreen;
+      routeName = Routes.supplierScreen;
       break;
     // Handle additional cases if necessary
     default:

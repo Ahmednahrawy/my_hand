@@ -17,9 +17,9 @@ class PdfMyDataTable extends pw.StatelessWidget {
       children: [
         pw.TableRow(
           children: [
-            _buildCell(
-              'العملية',
-            ),
+            // _buildCell(
+            //   'العملية',
+            // ),
             _buildCell(
               'المنتج',
             ),
@@ -47,7 +47,7 @@ class PdfMyDataTable extends pw.StatelessWidget {
         for (var product in products)
           pw.TableRow(
             children: [
-              _buildCell(product.action.toString()),
+              // _buildCell(product.action.toString()),
               _buildCell(product.name.toString()),
               _buildCell('${product.weight}'),
               _buildCell('${product.packageWeight.toStringAsFixed(2)}'),
@@ -74,5 +74,5 @@ class PdfMyDataTable extends pw.StatelessWidget {
         overflow: pw.TextOverflow.visible,
       ),
     );
-  }
+  } 
 }

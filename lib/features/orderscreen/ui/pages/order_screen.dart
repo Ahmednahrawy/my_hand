@@ -28,47 +28,33 @@ class Orderscreen extends StatefulWidget {
 }
 
 class _OrderscreenState extends State<Orderscreen> {
+  // Variables for user inputs and calculations
   String? formattedDate;
   String? formattedTime;
-  // format date now
-  late DateTime selectedDate;
-
+  final DateTime selectedDate = DateTime.now();
   final List<Product> products = [];
-  final List<String> actions = [
-    'شراء',
-    'بـيع',
-    'تخزين',
-  ];
+  final List<String> actions = ['شراء', 'بـيع', 'تخزين'];
   String? _action;
   String? buttonType;
   String? _customerName;
-  final GlobalKey<FormState> _dropdownSearchKey = GlobalKey<FormState>();
+  final List<String> _productList = ProductListConstants.productList;
+  String? _selectedProduct;
+  // Controllers for managing input fields
+  final _packageNumberController = TextEditingController(text: "0");
+  final _packageWeightController = TextEditingController(text: "2");
+  final _priceController = TextEditingController();
+  final _payController = TextEditingController(text: "0");
+  final _weightController = TextEditingController();
+  // Form keys
   final _formKey = GlobalKey<FormState>();
   final _payKey = GlobalKey<FormState>();
-  final _packageNumberController = TextEditingController();
-  final _packageWeightController = TextEditingController();
-  final _priceController = TextEditingController();
-  final _payController = TextEditingController();
-  final List<String> _productList = ProductListConstants.productList;
 
-  String? _selectedProduct;
-  final _weightController = TextEditingController();
-
-  @override
-  void initState() {
-    _packageWeightController.text = "2";
-    // _packageNumberController.text = "0";
-    // _priceController.text = "0";
-    _payController.text = "0";
-    super.initState();
-  }
-
-  Future<void> _selectDate(BuildContext context) async {
-    DateTime selectedDate = DateTime.now();
+  _selectDate(BuildContext context) {
     formattedDate = Utils.formatDate(selectedDate);
     formattedTime = Utils.formateTimeNow(selectedDate);
   }
 
+  // Computed properties for cost calculations
   double get _totalCost => products.fold(
         0,
         (sum, product) =>
@@ -86,6 +72,7 @@ class _OrderscreenState extends State<Orderscreen> {
     return ((_totalCost < 0) ? (-_totalCost) : _totalCost) - _paid;
   }
 
+  // Centralized error/toast handling
   void _showToast(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -103,6 +90,15 @@ class _OrderscreenState extends State<Orderscreen> {
     });
   }
 
+  // Clears all relevant input fields after adding a product
+  void _clearTextFields() {
+    _weightController.clear();
+    // _packageNumberController.clear();
+    // _priceController.clear();
+    // _selectedProduct = null; // Reset selected product
+  }
+
+  // Validates and adds a product to the list
   void _addProduct() {
     if (_action == null) {
       _showToast('رجاء تحديد نوع الفاتورة (تخزين, بـيع, شراء)');
@@ -114,28 +110,28 @@ class _OrderscreenState extends State<Orderscreen> {
     }
 
     if (_formKey.currentState!.validate()) {
-      setState(() {
-        products.add(
-          Product(
-            name: _selectedProduct!,
-            weight: double.parse(_weightController.text),
-            packageWeight: double.parse(_packageWeightController.text),
-            price: double.parse(_priceController.text),
-            numberPackage: int.parse(_packageNumberController.text),
-            action: _action!,
-          ),
-        );
-      });
-      _weightController.clear();
-      _packageNumberController.clear();
+      setState(
+        () {
+          products.add(
+            Product(
+              name: _selectedProduct!,
+              weight: double.parse(_weightController.text),
+              packageWeight: double.parse(_packageWeightController.text),
+              price: double.parse(_priceController.text),
+              numberPackage: int.parse(_packageNumberController.text),
+              action: _action!,
+            ),
+          );
+          _clearTextFields();
+        },
+      );
     }
-    _selectDate(context);
   }
 
-  // send invoice
-  void _sendInvoice() async {
-    _selectDate(context);
+  // Generates and shares an invoice as a PDF file
+  Future<void> _sendInvoice() async {
     if (_payKey.currentState!.validate()) {
+      _selectDate(context);
       try {
         final pdfDoc = await generatePDF(
             PdfPageFormat.a4,
@@ -156,6 +152,7 @@ class _OrderscreenState extends State<Orderscreen> {
       } catch (e) {
         Navigator.of(context).pop();
         _showToast('فشل إرسال فاتورة: $e');
+        print('فشل إرسال فاتورة: $e');
       }
     }
   }
@@ -167,11 +164,110 @@ class _OrderscreenState extends State<Orderscreen> {
     });
   }
 
+  // floating action button
+  _showModalForInvoiceSummary() {
+    // media query size
+    final size = MediaQuery.sizeOf(context);
+
+    return FloatingActionButton(
+      onPressed: () {
+        showModalBottomSheet(
+          backgroundColor: ColorsManager.moreLighterGray,
+          context: context,
+          builder: (BuildContext context) {
+            return GestureDetector(
+              onTap: () => FocusScope.of(context).unfocus(),
+              child: Directionality(
+                textDirection: TextDirection.rtl,
+                child: SizedBox(
+                  width: size.width,
+                  height: 500,
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.vertical,
+                    child: Column(
+                      children: [
+                        verticalSpace(5),
+                        SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          reverse: false,
+                          child: MyDataTable(
+                            products: products,
+                            isInModal: true,
+                          ),
+                        ),
+                        Column(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            Text(
+                              'إجالي المبلغ: ${_totalCost.toStringAsFixed(2)}  L.E',
+                              textDirection: TextDirection.rtl,
+                            ),
+                            Text(
+                              'التحصيل : $_paid L.E ',
+                              textDirection: TextDirection.rtl,
+                            ),
+                            Text(
+                              'الباقي: ${_rest.toStringAsFixed(2)} L.E',
+                              textDirection: TextDirection.rtl,
+                            ),
+                          ],
+                        ),
+                        verticalSpace(5),
+                        // paying
+                        Form(
+                          key: _payKey,
+                          child: AppTextFormField(
+                            controller: _payController,
+                            labelText: 'تحصيل',
+                            suffixText: 'جنيه',
+                            suffixIcon: IconButton(
+                              onPressed: () {
+                                _payController
+                                    .clear(); // Clear the input when the clear icon is pressed
+                                _payController.text = '';
+                              },
+                              icon: _payController.text == ''
+                                  ? const SizedBox.shrink()
+                                  : const Icon(Icons.clear),
+                            ),
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'رجاء أدخل قيمة التحصيل';
+                              }
+                              return null;
+                            },
+                          ),
+                        ),
+                        // send button
+                        verticalSpace(10),
+                        AppTextButton(
+                          onPressed: _sendInvoice,
+                          buttonText: 'إرسال',
+                          textStyle: TextStyles.font18WhiteMedium,
+                          verticalPadding: 5.sp,
+                          buttonWidth: size.width * 0.5,
+                          backgroundColor: ColorsManager.gray,
+                        ),
+                        verticalSpace(10),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            );
+          },
+        );
+      },
+      child: const Icon(
+        Icons.share_sharp,
+        size: 28,
+      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(50)),
+    );
+  }
+
   @override
   void dispose() {
-    _dropdownSearchKey.currentState?.dispose();
-    _formKey.currentState?.dispose();
-    _payKey.currentState?.dispose();
     _packageNumberController.dispose();
     _packageWeightController.dispose();
     _priceController.dispose();
@@ -183,7 +279,7 @@ class _OrderscreenState extends State<Orderscreen> {
   @override
   Widget build(BuildContext context) {
     // media query size
-    final screenSize = MediaQuery.of(context).size;
+    final size = MediaQuery.sizeOf(context);
     return Directionality(
       textDirection: TextDirection.rtl,
       child: Scaffold(
@@ -194,112 +290,17 @@ class _OrderscreenState extends State<Orderscreen> {
             style: TextStyles.font20MainBlueBold,
           ),
         ),
+
         drawer: const SideNav(),
         extendBody: true,
         // Send data button
-        floatingActionButton: FloatingActionButton(
-          onPressed: () {
-            showModalBottomSheet(
-              backgroundColor: ColorsManager.moreLighterGray,
-              context: context,
-              builder: (BuildContext context) {
-                return GestureDetector(
-                  onTap: () => FocusScope.of(context).unfocus(),
-                  child: Directionality(
-                    textDirection: TextDirection.rtl,
-                    child: SizedBox(
-                      width: screenSize.width,
-                      height: 500,
-                      child: SingleChildScrollView(
-                        scrollDirection: Axis.vertical,
-                        child: Column(
-                          children: [
-                            verticalSpace(5),
-                            SingleChildScrollView(
-                              scrollDirection: Axis.horizontal,
-                              reverse: false,
-                              child: MyDataTable(
-                                products: products,
-                                isInModal: true,
-                              ),
-                            ),
-                            Column(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              children: [
-                                Text(
-                                  'إجالي المبلغ: ${_totalCost.toStringAsFixed(2)}  L.E',
-                                  textDirection: TextDirection.rtl,
-                                ),
-                                Text(
-                                  'التحصيل : $_paid L.E ',
-                                  textDirection: TextDirection.rtl,
-                                ),
-                                Text(
-                                  'الباقي: ${_rest.toStringAsFixed(2)} L.E',
-                                  textDirection: TextDirection.rtl,
-                                ),
-                              ],
-                            ),
-                            verticalSpace(5),
-                            // paying
-                            Form(
-                              key: _payKey,
-                              child: AppTextFormField(
-                                controller: _payController,
-                                labelText: 'تحصيل',
-                                suffixText: 'جنيه',
-                                suffixIcon: IconButton(
-                                  onPressed: () {
-                                    _payController
-                                        .clear(); // Clear the input when the clear icon is pressed
-                                    setState(() {
-                                      _payController.text = '';
-                                    });
-                                  },
-                                  icon: _payController.text == ''
-                                      ? SizedBox.shrink()
-                                      : Icon(Icons.clear),
-                                ),
-                                validator: (value) {
-                                  if (value == null || value.isEmpty) {
-                                    return 'رجاء أدخل قيمة التحصيل';
-                                  }
-                                  return null;
-                                },
-                              ),
-                            ),
-
-                            verticalSpace(10),
-                            AppTextButton(
-                              onPressed: _sendInvoice,
-                              buttonText: 'إرسال',
-                              textStyle: TextStyles.font18WhiteMedium,
-                              buttonWidth: screenSize.width * 0.5,
-                              backgroundColor: ColorsManager.gray,
-                            ),
-                            verticalSpace(10),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                );
-              },
-            );
-          },
-          child: const Icon(
-            Icons.share_sharp,
-            size: 28,
-          ),
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(50)),
-        ),
+        floatingActionButton: _showModalForInvoiceSummary(),
         body: GestureDetector(
           onTap: () => FocusScope.of(context).unfocus(),
           child: Center(
             child: Container(
-              width: screenSize.width * 0.95,
-              height: screenSize.height,
+              width: size.width * 0.95,
+              height: size.height,
               child: SingleChildScrollView(
                 scrollDirection: Axis.vertical,
                 padding: const EdgeInsets.all(5),
@@ -328,7 +329,7 @@ class _OrderscreenState extends State<Orderscreen> {
                                   onPressed: () {
                                     _activeTextButton(action);
                                   },
-                                  buttonWidth: screenSize.width * 0.28,
+                                  buttonWidth: size.width * 0.28,
                                   buttonHeight: 12,
                                   verticalPadding: 2,
                                   buttonText: action,
@@ -348,7 +349,6 @@ class _OrderscreenState extends State<Orderscreen> {
                               Flexible(
                                 flex: 3,
                                 child: DropdownSearch<String>(
-                                  key: _dropdownSearchKey,
                                   autoValidateMode:
                                       AutovalidateMode.onUserInteraction,
                                   items: (filter, infiniteScrollProps) =>
@@ -358,7 +358,7 @@ class _OrderscreenState extends State<Orderscreen> {
                                     decoration: InputDecoration(
                                       labelText: 'المنتج',
                                       suffixIcon: Icon(Icons.search),
-                                      hintText: 'Search',
+                                      hintText: 'اختر منتج',
                                     ),
                                   ),
                                   popupProps: PopupProps.menu(
@@ -366,7 +366,7 @@ class _OrderscreenState extends State<Orderscreen> {
                                     itemBuilder: (context, item, isDisabled,
                                         isSelected) {
                                       return Container(
-                                        decoration: BoxDecoration(
+                                        decoration: const BoxDecoration(
                                           border: Border(
                                             bottom: BorderSide(
                                               color: ColorsManager
@@ -383,10 +383,7 @@ class _OrderscreenState extends State<Orderscreen> {
                                     showSearchBox: true,
                                   ),
                                   onChanged: (value) {
-                                    setState(() {
-                                      // _productController.text = value;
-                                      _selectedProduct = value;
-                                    });
+                                    _selectedProduct = value;
                                   },
                                 ),
                               ),
@@ -403,11 +400,9 @@ class _OrderscreenState extends State<Orderscreen> {
                                           onPressed: () {
                                             _weightController
                                                 .clear(); // Clear the input when the clear icon is pressed
-                                            setState(() {
-                                              _weightController.text = '';
-                                            });
+                                            _weightController.text = '';
                                           },
-                                          icon: Icon(Icons.clear),
+                                          icon: const Icon(Icons.clear),
                                         ),
                                   validator: (value) {
                                     if (value == null || value.isEmpty) {
@@ -456,12 +451,10 @@ class _OrderscreenState extends State<Orderscreen> {
                                             onPressed: () {
                                               _packageNumberController
                                                   .clear(); // Clear the input when the clear icon is pressed
-                                              setState(() {
-                                                _packageNumberController.text =
-                                                    '';
-                                              });
+                                              _packageNumberController.text =
+                                                  '';
                                             },
-                                            icon: Icon(Icons.clear),
+                                            icon: const Icon(Icons.clear),
                                           ),
                                     validator: (value) {
                                       if (value == null || value.isEmpty) {
@@ -484,11 +477,9 @@ class _OrderscreenState extends State<Orderscreen> {
                                             onPressed: () {
                                               _priceController
                                                   .clear(); // Clear the input when the clear icon is pressed
-                                              setState(() {
-                                                _priceController.text = '';
-                                              });
+                                              _priceController.text = '';
                                             },
-                                            icon: Icon(Icons.clear),
+                                            icon: const Icon(Icons.clear),
                                           ),
                                     validator: (value) {
                                       if (value == null || value.isEmpty) {
@@ -511,12 +502,13 @@ class _OrderscreenState extends State<Orderscreen> {
                       buttonText: 'أضف منتج',
                       textStyle: TextStyles.font16WhiteSemiBold,
                       backgroundColor: ColorsManager.mainBlue,
-                      buttonWidth: screenSize.width * 0.6,
+                      buttonWidth: size.width * 0.6,
                     ),
                     verticalSpace(10),
+                    Text(_action.toString()),
                     // Products table
                     SizedBox(
-                      width: screenSize.width,
+                      width: size.width,
                       child: MyDataTable(
                         products: products,
                         isInModal: false,
@@ -535,6 +527,8 @@ class _OrderscreenState extends State<Orderscreen> {
             ),
           ),
         ),
+
+        resizeToAvoidBottomInset: false,
       ),
     );
   }
