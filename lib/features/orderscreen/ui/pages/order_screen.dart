@@ -27,7 +27,7 @@ class Orderscreen extends StatefulWidget {
   State<Orderscreen> createState() => _OrderscreenState();
 }
 
-class _OrderscreenState extends State<Orderscreen> {
+class _OrderscreenState extends State<Orderscreen> {  
   // Variables for user inputs and calculations
   String? formattedDate;
   String? formattedTime;
@@ -185,14 +185,18 @@ class _OrderscreenState extends State<Orderscreen> {
                   child: SingleChildScrollView(
                     scrollDirection: Axis.vertical,
                     child: Column(
+                      mainAxisSize: MainAxisSize.min,
                       children: [
                         verticalSpace(5),
-                        SingleChildScrollView(
-                          scrollDirection: Axis.horizontal,
-                          reverse: false,
-                          child: MyDataTable(
-                            products: products,
-                            isInModal: true,
+                        SizedBox(
+                          width: size.width,
+                          child: SingleChildScrollView(
+                            scrollDirection: Axis.horizontal,
+                            reverse: false,
+                            child: MyDataTable(
+                              products: products,
+                              isInModal: true,
+                            ),
                           ),
                         ),
                         Column(

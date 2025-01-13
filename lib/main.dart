@@ -2,7 +2,9 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:my_hand/config/routes/app_router.dart';
+import 'package:my_hand/core/providers/language.dart';
 import 'package:my_hand/my_app.dart';
+import 'package:provider/provider.dart';
 import 'firebase_options.dart';
 
 Future<void> main() async {
@@ -16,7 +18,12 @@ Future<void> main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  runApp(MyApp(
-    appRouter: AppRouter(),
+  runApp(MultiProvider(
+    providers: [
+      ChangeNotifierProvider(create: (_) => Language()),
+    ],
+    child: MyApp(
+      appRouter: AppRouter(),
+    ),
   ));
 }
